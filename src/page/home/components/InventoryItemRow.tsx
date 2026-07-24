@@ -37,11 +37,11 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
           {item.nombreArticulo}
         </span>
         <span className="text-xs text-neutral-500 mt-0.5">
-          Exist. Previa:{" "}
+          Previa:{" "}
           <strong className="text-neutral-700">
             {prevNum} {unit}
           </strong>{" "}
-          | Exist. Actual:{" "}
+          | Actual:{" "}
           <strong className="text-neutral-700">
             {actNum} {unit}
           </strong>
