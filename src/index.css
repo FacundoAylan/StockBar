@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 @media print {
+  @page {
+    margin: 0;
+  }
 
-  /* Forzar a que el cuerpo y contenedor se alineen arriba */
   body,
   main,
   .printable-modal {
@@ -15,11 +17,26 @@
     min-height: 0 !important;
   }
 
-  /* Ajuste para que el modal ocupe toda la hoja desde arriba */
+  body {
+    padding: 1.5cm !important;
+  }
+
   .printable-modal {
     position: relative !important;
     max-height: none !important;
     box-shadow: none !important;
     border: none !important;
+  }
+
+  /* 🎯 EVITAR CORTES EN BLOQUES COMPLETO (Categorías, filas, tarjetas) */
+  .avoid-break {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* 🎯 FORZAR SALTO DE PÁGINA (por si quieres separar secciones) */
+  .force-page-break {
+    break-before: page !important;
+    page-break-before: always !important;
   }
 }

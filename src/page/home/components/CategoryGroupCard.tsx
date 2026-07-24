@@ -71,7 +71,7 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
   };
 
   return (
-    <div className="border border-neutral-200 rounded-xl p-5 bg-neutral-50/50 hover:bg-neutral-50 transition-colors shadow-sm">
+    <div className="border border-neutral-200 rounded-xl p-5 bg-neutral-50/50 hover:bg-neutral-50 transition-colors shadow-sm avoid-break print:break-inside-avoid">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-200 pb-3 mb-4">
         <div>
           <div className="flex items-center gap-2">
@@ -103,7 +103,6 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
           {renderVarianceBadge(group.diferencia)}
         </div>
       </div>
-
       <ul className="divide-y divide-neutral-200/60">
         {filteredItems.map(({ item, itemIdx }) => (
           <InventoryItemRow
