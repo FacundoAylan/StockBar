@@ -83,14 +83,14 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
 
           <div className="flex items-center gap-3 text-xs text-neutral-600 mt-1 pl-8 font-medium">
             <span>
-              Exist. Previa:{" "}
+              Previa:{" "}
               <strong className="text-neutral-900 bg-neutral-200 px-1.5 py-0.5 rounded">
                 {group.existenciaPrevia || "0"}
               </strong>
             </span>
             <span>•</span>
             <span>
-              Exist. Actual:{" "}
+              Actual:{" "}
               <strong className="text-neutral-900 bg-neutral-200 px-1.5 py-0.5 rounded">
                 {group.existencia || "0"}
               </strong>
