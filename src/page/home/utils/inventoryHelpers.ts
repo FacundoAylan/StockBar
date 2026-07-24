@@ -8,7 +8,7 @@ export interface ItemAnalysis {
   esDiferenciaNegativa: boolean;
   esFaltante: boolean;
   accion: "Faltan" | "Sobran";
-  signo: "+" | "-";
+  signo: "+" | "-"| "";
   unit: UnitType;
   diffAmount: number;
   prevNum: number;
@@ -90,7 +90,9 @@ export const analyzeItem = (item: InventoryItem): ItemAnalysis => {
   const diffAmount = diffAbs || usadoAbs;
 
   const esFaltante = esDiferenciaNegativa || esUsadoNegativo;
-  const signo = esFaltante ? "-" : "+";
+
+  // 🎯 CAMBIO AQUÍ: Se eliminan '+' y '-' para dejar el signo vacío
+  const signo = "";
   const accion = esFaltante ? "Faltan" : "Sobran";
 
   return {
@@ -104,7 +106,7 @@ export const analyzeItem = (item: InventoryItem): ItemAnalysis => {
     diffAmount,
     prevNum: rawPrevia,
     actNum: rawActual,
-    diffStr: `${signo}${diffAmount} ${unit}`,
+    diffStr: `${diffAmount} ${unit}`,
     ventasStr: `${rawVendido} ${unit}`,
     usoStr: `${usadoAbs} ${unit}`,
   };
