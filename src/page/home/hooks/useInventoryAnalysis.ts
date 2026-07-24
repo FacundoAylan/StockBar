@@ -25,6 +25,11 @@ export function useInventoryAnalysis() {
   );
   const [copied, setCopied] = useState(false);
 
+  //Estado visible de costos
+  const [showCosts, setShowCosts] = useState<boolean>(true);
+
+  const toggleCosts = () => setShowCosts((prev) => !prev);
+
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     event.stopPropagation();
     const selectedFile = event.target.files?.[0];
@@ -156,5 +161,8 @@ export function useInventoryAnalysis() {
     getFilteredItems,
     generateGmailText,
     copyToClipboard,
+    showCosts,
+    setShowCosts,
+    toggleCosts,
   };
 }

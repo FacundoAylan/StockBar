@@ -7,6 +7,7 @@ interface CategoryGroupCardProps {
   groupIndex: number;
   filteredItems: Array<{ item: InventoryGroup["items"][0]; itemIdx: number }>;
   showNegative: boolean;
+  showCosts: boolean;
   editMode: boolean;
   onDeleteItem: (groupIndex: number, itemIndex: number) => void;
 }
@@ -16,6 +17,7 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
   groupIndex,
   filteredItems,
   showNegative,
+  showCosts,
   editMode,
   onDeleteItem,
 }) => {
@@ -97,7 +99,7 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
         </div>
 
         <div className="flex items-center gap-2.5">
-          {renderCostImpactBadge(group.diferenciaCosto)}
+          {showCosts && renderCostImpactBadge(group.diferenciaCosto)}
           {renderVarianceBadge(group.diferencia)}
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { useInventoryAnalysis } from "./hooks/useInventoryAnalysis";
 import { CategoryGroupCard } from "./components/CategoryGroupCard";
 
-export default function App() {
+const Home = () => {
   const {
     jsonData,
     fileName,
@@ -21,6 +21,8 @@ export default function App() {
     getFilteredItems,
     generateGmailText,
     copyToClipboard,
+    showCosts,
+    toggleCosts
   } = useInventoryAnalysis();
 
   return (
@@ -122,6 +124,18 @@ export default function App() {
 
                 <button
                   type="button"
+                  onClick={toggleCosts}
+                  className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all border flex items-center gap-1.5 cursor-pointer shadow-sm ${
+                    showCosts
+                      ? "bg-amber-100 text-amber-900 border-amber-300 hover:bg-amber-200"
+                      : "bg-neutral-100 text-neutral-600 border-neutral-300 hover:bg-neutral-200"
+                  }`}
+                >
+                  {showCosts ? "💰 Ocultar Costos" : "👁️ Mostrar Costos"}
+                </button>
+
+                <button
+                  type="button"
                   onClick={() => setShowTextModal(true)}
                   className="px-3.5 py-2 bg-neutral-800 hover:bg-neutral-900 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm"
                 >
@@ -162,6 +176,7 @@ export default function App() {
                     groupIndex={groupIndex}
                     filteredItems={itemsFiltrados}
                     showNegative={showNegative}
+                    showCosts={showCosts}
                     editMode={editMode}
                     onDeleteItem={handleDeleteItem}
                   />
@@ -233,3 +248,5 @@ export default function App() {
     </main>
   );
 }
+
+export default Home;
