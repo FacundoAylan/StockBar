@@ -110,6 +110,7 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
             item={item}
             itemIdx={itemIdx}
             groupIndex={groupIndex}
+            categoryName={group.categoria}
             editMode={editMode}
             onDeleteItem={onDeleteItem}
           />

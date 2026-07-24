@@ -11,6 +11,7 @@ export interface InventoryItem {
   ingresos: string | null;
   porcentajeCosto: string | null;
   porcentajeCostoIdeal: string | null;
+  unidad?: string | null;
 }
 
 export interface InventoryGroup {

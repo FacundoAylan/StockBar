@@ -6,6 +6,7 @@ interface InventoryItemRowProps {
   item: InventoryItem;
   itemIdx: number;
   groupIndex: number;
+  categoryName?: string; // 👈 1. Agregado como prop opcional
   editMode: boolean;
   onDeleteItem: (groupIndex: number, itemIndex: number) => void;
 }
@@ -14,6 +15,7 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
   item,
   itemIdx,
   groupIndex,
+  categoryName, // 👈 2. Desestructurado aquí
   editMode,
   onDeleteItem,
 }) => {
@@ -26,10 +28,10 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
     actNum,
     ventasStr,
     usoStr,
-  } = analyzeItem(item);
+  } = analyzeItem(item, categoryName); // 👈 3. Se pasa la categoría a analyzeItem
 
   return (
-    <li className="py-3 flex flex-col sm:flex-row sm:items-center justify-between text-sm gap-2 px-2 rounded-lg">
+    <li className="py-3 flex flex-col sm:flex-row sm:items-center justify-between text-sm gap-2 px-2 rounded-lg avoid-break print:break-inside-avoid">
       <div className="flex flex-col">
         <span className="font-semibold text-neutral-800">
           {item.nombreArticulo}
@@ -70,7 +72,7 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
           <button
             type="button"
             onClick={() => onDeleteItem(groupIndex, itemIdx)}
-            className="ml-2 text-rose-500 hover:text-rose-700 font-bold bg-rose-50 hover:bg-rose-100 p-1.5 rounded-lg transition-colors border border-rose-200 cursor-pointer"
+            className="ml-2 text-rose-500 hover:text-rose-700 font-bold bg-rose-50 hover:bg-rose-100 p-1.5 rounded-lg transition-colors border border-rose-200 cursor-pointer print:hidden"
             title="Eliminar del reporte"
           >
             🗑️ Borrar
