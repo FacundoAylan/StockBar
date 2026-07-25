@@ -8,8 +8,9 @@ interface InventoryItemRowProps {
   groupIndex: number;
   categoryName?: string;
   editMode: boolean;
-  forceAllBtl?: boolean; 
+  forceAllBtl?: boolean;
   onDeleteItem: (groupIndex: number, itemIndex: number) => void;
+  onToggleUnit: (groupIndex: number, itemIndex: number) => void;
 }
 
 export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
@@ -20,6 +21,7 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
   editMode,
   forceAllBtl = false,
   onDeleteItem,
+  onToggleUnit,
 }) => {
   const {
     tieneDiferencia,
@@ -76,15 +78,29 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
           Uso: <strong className="text-neutral-700">{usoStr}</strong>
         </span>
 
+        {/* 🎯 BOTONES DE MODO EDICIÓN */}
         {editMode && (
-          <button
-            type="button"
-            onClick={() => onDeleteItem(groupIndex, itemIdx)}
-            className="ml-2 text-rose-500 hover:text-rose-700 font-bold bg-rose-50 hover:bg-rose-100 p-1.5 rounded-lg transition-colors border border-rose-200 cursor-pointer print:hidden"
-            title="Eliminar del reporte"
-          >
-            🗑️ Borrar
-          </button>
+          <div className="flex items-center gap-1.5 ml-2 print:hidden">
+            {/* Botón para alternar unidad individual (Botella vs Caja/ml) */}
+            <button
+              type="button"
+              onClick={() => onToggleUnit(groupIndex, itemIdx)}
+              className="text-amber-700 hover:text-amber-900 font-bold bg-amber-50 hover:bg-amber-100 p-1.5 rounded-lg transition-colors border border-amber-200 cursor-pointer"
+              title={`Unidad actual: ${unit}. Clic para alternar (btl ↔ ml)`}
+            >
+              {unit === "btl" ? "🍾" : "📦"}
+            </button>
+
+            {/* Botón Borrar */}
+            <button
+              type="button"
+              onClick={() => onDeleteItem(groupIndex, itemIdx)}
+              className="text-rose-500 hover:text-rose-700 font-bold bg-rose-50 hover:bg-rose-100 p-1.5 rounded-lg transition-colors border border-rose-200 cursor-pointer"
+              title="Eliminar del reporte"
+            >
+              🗑️ Borrar
+            </button>
+          </div>
         )}
       </div>
     </li>

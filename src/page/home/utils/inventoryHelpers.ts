@@ -37,16 +37,21 @@ export const detectUnit = (
   categoryName?: string,
   forceAllBtl: boolean = false,
 ): UnitType => {
-  // 🎯 Si el botón está activado, todo pasa automáticamente a 'btl'
+  // 1. Prioridad Máxima Global: Si el switch global está activo, forzar todo a 'btl'
   if (forceAllBtl) {
     return "btl";
+  }
+
+  // 🎯 2. Prioridad Manual: Si el usuario cambió la unidad manualmente en modo edición
+  if (item.manualUnit) {
+    return item.manualUnit as UnitType;
   }
 
   const categoryStr = (categoryName || "").toLowerCase();
   const nameStr = (item.nombreArticulo || "").toLowerCase();
   const textToTest = `${categoryStr} ${nameStr}`.toLowerCase();
 
-  // 1. REGLA: LITROS / BARRIL (Kegs, Chopp, Cerveza Tirada)
+  // 3. REGLA: LITROS / BARRIL (Kegs, Chopp, Cerveza Tirada)
   if (
     textToTest.includes("keg") ||
     textToTest.includes("barril") ||
@@ -57,8 +62,7 @@ export const detectUnit = (
     return "L";
   }
 
-  // 2. REGLA PRINCIPAL DE BOTELLAS Y UNIDADES (PRIORIDAD ALTA)
-  // Todo lo que encaje aquí SERÁ BOTELLA ('btl') aunque en el nombre diga '500ml' o '350ml'
+  // 4. REGLA PRINCIPAL DE BOTELLAS Y UNIDADES (PRIORIDAD ALTA)
   if (
     // AGUAS Y BEBIDAS SIN ALCOHOL
     textToTest.includes("agua") ||
@@ -109,7 +113,7 @@ export const detectUnit = (
     return "btl";
   }
 
-  // 3. REGLA POR DEFECTO: Destilados / Licores / Coctelería a granel
+  // 5. REGLA POR DEFECTO: Destilados / Licores / Coctelería a granel
   return "ml";
 };
 
@@ -146,7 +150,7 @@ export const analyzeItem = (
   const accion = esFaltante ? "Faltan" : "Sobran";
 
   return {
-    tieneDiferencia, // 👈 Se usará para ocultar el badge en la UI
+    tieneDiferencia,
     esUsadoNegativo,
     esDiferenciaNegativa,
     esFaltante,

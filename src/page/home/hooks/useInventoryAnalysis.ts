@@ -2,10 +2,11 @@ import { useState, type ChangeEvent } from "react";
 import { csvToJson } from "../utils/csvParser";
 import {
   analyzeItem,
+  detectUnit,
   parsePercentage,
   cleanNumber,
 } from "../utils/inventoryHelpers";
-import type { InventoryGroup } from "../../../types/inventory";
+import type { InventoryGroup, InventoryItem } from "../../../types/inventory";
 
 export function useInventoryAnalysis() {
   const [jsonData, setJsonData] = useState<InventoryGroup[] | null>(null);
@@ -55,6 +56,28 @@ export function useInventoryAnalysis() {
     setIgnoredItemKeys((prev) => new Set(prev).add(key));
   };
 
+  // 🎯 NUEVO: Manejador para alternar la unidad individual de un producto (btl ↔ ml)
+  const handleToggleUnit = (groupIndex: number, itemIndex: number) => {
+    setJsonData((prevData) => {
+      if (!prevData) return prevData;
+
+      const newData = structuredClone(prevData);
+      const group = newData[groupIndex];
+      const item = group.items[itemIndex] as InventoryItem & {
+        manualUnit?: string;
+      };
+
+      // Detectamos su unidad actual considerando la categoría
+      const currentUnit = detectUnit(item, group.categoria, forceAllBtl);
+      const nextUnit = currentUnit === "btl" ? "ml" : "btl";
+
+      // Asignamos el override manual
+      item.manualUnit = nextUnit;
+
+      return newData;
+    });
+  };
+
   const getFilteredItems = (
     items: InventoryGroup["items"],
     groupIndex: number,
@@ -84,7 +107,6 @@ export function useInventoryAnalysis() {
         }
 
         // 🎯 2. FILTRO POR VOLUMEN ESTRICTO:
-        // Si forceAllBtl es true, analysis.unit es "btl", por lo que no filtra nada.
         if (
           minAmountFilter > 0 &&
           analysis.unit === "ml" &&
@@ -114,7 +136,6 @@ export function useInventoryAnalysis() {
         let mainUnit = "btl";
 
         itemsFiltrados.forEach(({ item }) => {
-          // 🎯 Pasar categoryName y forceAllBtl para coincidir con la UI
           const analysis = analyzeItem(item, categoryName, forceAllBtl);
           const prevNum = Math.abs(cleanNumber(item.existenciaPrevia));
 
@@ -138,7 +159,6 @@ export function useInventoryAnalysis() {
         text += `${group.icono} ${group.categoria}: ${accionCat} ${valAbs} ${mainUnit}${pctCatStr}\n`;
 
         itemsFiltrados.forEach(({ item }) => {
-          // 🎯 Pasar categoryName y forceAllBtl aquí también
           const analysis = analyzeItem(item, categoryName, forceAllBtl);
           text += `• ${item.nombreArticulo}: ${analysis.accion} ${analysis.diffAmount} ${analysis.unit} — Ventas: ${analysis.ventasStr} | Uso real: ${analysis.usoStr}.\n`;
         });
@@ -174,6 +194,7 @@ export function useInventoryAnalysis() {
     copied,
     handleFileChange,
     handleDeleteItem,
+    handleToggleUnit, 
     getFilteredItems,
     generateGmailText,
     copyToClipboard,

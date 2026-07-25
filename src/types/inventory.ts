@@ -12,13 +12,14 @@ export interface InventoryItem {
   porcentajeCosto: string | null;
   porcentajeCostoIdeal: string | null;
   unidad?: string | null;
+  manualUnit?: string | null;
 }
 
 export interface InventoryGroup {
   categoria: string;
   icono?: string;
   existenciaPrevia?: string;
-  compras?: string; 
+  compras?: string;
   existencia?: string;
   usado?: string;
   vendido?: string;

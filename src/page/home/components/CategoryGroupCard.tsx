@@ -9,8 +9,9 @@ interface CategoryGroupCardProps {
   showNegative?: boolean;
   showCosts: boolean;
   editMode: boolean;
-  forceAllBtl?: boolean; // 🎯 Se agrega prop opcional
+  forceAllBtl?: boolean;
   onDeleteItem: (groupIndex: number, itemIndex: number) => void;
+  onToggleUnit: (groupIndex: number, itemIndex: number) => void;
 }
 
 export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
@@ -21,6 +22,7 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
   editMode,
   forceAllBtl = false,
   onDeleteItem,
+  onToggleUnit, // 🎯 2. Desestructurado aquí
 }) => {
   // 1. % DIFERENCIA
   const renderPercentageBadge = (porcentaje?: string | number | null) => {
@@ -138,6 +140,7 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
             editMode={editMode}
             forceAllBtl={forceAllBtl}
             onDeleteItem={onDeleteItem}
+            onToggleUnit={onToggleUnit} 
           />
         ))}
       </ul>

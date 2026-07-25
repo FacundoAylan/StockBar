@@ -16,6 +16,7 @@ const Home = () => {
     copied,
     handleFileChange,
     handleDeleteItem,
+    handleToggleUnit,
     getFilteredItems,
     generateGmailText,
     copyToClipboard,
@@ -185,6 +186,7 @@ const Home = () => {
                     editMode={editMode}
                     forceAllBtl={forceAllBtl}
                     onDeleteItem={handleDeleteItem}
+                    onToggleUnit={handleToggleUnit}
                   />
                 );
               })}
