@@ -59,7 +59,7 @@ export const detectUnit = (
     hasWord(textToTest, "café") ||
     hasWord(textToTest, "espresso") ||
     hasWord(textToTest, "martini") ||
-    hasWord(textToTest, "cinzano") ||
+    hasWord(textToTest, "cinzano rosso") ||
     hasWord(textToTest, "canela") ||
     hasWord(textToTest, "Lunfa") ||
     hasWord(textToTest, "Veraniego") ||
