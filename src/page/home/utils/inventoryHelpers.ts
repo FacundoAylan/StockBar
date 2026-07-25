@@ -124,14 +124,15 @@ export const analyzeItem = (
   const rawPrevia = Math.abs(cleanNumber(item.existenciaPrevia));
   const rawActual = Math.abs(cleanNumber(item.existencia));
 
-  // 🎯 1. Pasamos categoryName Y forceAllBtl a detectUnit
   const unit = detectUnit(item, categoryName, forceAllBtl);
 
   const diffTrimmed = (item.diferencia || "").trim();
+
+  // 🎯 Solo tiene diferencia si es estrictamente distinta de 0
   const tieneDiferencia =
-    rawDiff !== 0 ||
-    (diffTrimmed !== "" &&
-      !["0", "0ml", "0btl", "0l"].includes(diffTrimmed.toLowerCase()));
+    rawDiff !== 0 &&
+    diffTrimmed !== "" &&
+    !["0", "0ml", "0btl", "0l"].includes(diffTrimmed.toLowerCase());
 
   const esUsadoNegativo = (item.usado?.includes("-") ?? false) || rawUsado < 0;
   const esDiferenciaNegativa =
@@ -139,26 +140,18 @@ export const analyzeItem = (
 
   const usadoAbs = Math.abs(rawUsado);
   const diffAbs = Math.abs(rawDiff);
-  const diffAmount = diffAbs || usadoAbs;
+  const diffAmount = diffAbs;
 
-  // 🎯 2. Determinación directa sin reasignaciones
-  const esFaltante =
-    rawDiff !== 0
-      ? esDiferenciaNegativa
-      : rawUsado !== 0
-        ? !esUsadoNegativo
-        : rawActual < rawPrevia;
-
-  const signo = "";
+  const esFaltante = esDiferenciaNegativa;
   const accion = esFaltante ? "Faltan" : "Sobran";
 
   return {
-    tieneDiferencia,
+    tieneDiferencia, // 👈 Se usará para ocultar el badge en la UI
     esUsadoNegativo,
     esDiferenciaNegativa,
     esFaltante,
     accion,
-    signo,
+    signo: "",
     unit,
     diffAmount,
     prevNum: rawPrevia,

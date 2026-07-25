@@ -18,10 +18,11 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
   groupIndex,
   categoryName,
   editMode,
-  forceAllBtl = false, 
+  forceAllBtl = false,
   onDeleteItem,
 }) => {
   const {
+    tieneDiferencia,
     esFaltante,
     signo,
     diffAmount,
@@ -30,7 +31,7 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
     actNum,
     ventasStr,
     usoStr,
-  } = analyzeItem(item, categoryName, forceAllBtl); 
+  } = analyzeItem(item, categoryName, forceAllBtl);
 
   return (
     <li className="py-3 flex flex-col sm:flex-row sm:items-center justify-between text-sm gap-2 px-2 rounded-lg avoid-break print:break-inside-avoid">
@@ -51,18 +52,23 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
       </div>
 
       <div className="flex items-center gap-3 text-xs">
-        <span
-          className={`font-bold px-2.5 py-1 rounded-md border ${
-            esFaltante
-              ? "text-rose-700 bg-rose-50 border-rose-200"
-              : "text-emerald-700 bg-emerald-50 border-emerald-200"
-          }`}
-        >
-          {esFaltante ? "Faltan" : "Sobran"} {signo}
-          {diffAmount} {unit}
-        </span>
+        {/* 🎯 SOLO MOSTRAR SI REALMENTE HAY UNA DIFERENCIA DISTINTA DE 0 */}
+        {tieneDiferencia && (
+          <>
+            <span
+              className={`font-bold px-2.5 py-1 rounded-md border ${
+                esFaltante
+                  ? "text-rose-700 bg-rose-50 border-rose-200"
+                  : "text-emerald-700 bg-emerald-50 border-emerald-200"
+              }`}
+            >
+              {esFaltante ? "Faltan" : "Sobran"} {signo}
+              {diffAmount} {unit}
+            </span>
+            <span className="text-neutral-300">|</span>
+          </>
+        )}
 
-        <span className="text-neutral-300">|</span>
         <span className="text-neutral-500">
           Ventas: <strong className="text-neutral-700">{ventasStr}</strong>
         </span>
