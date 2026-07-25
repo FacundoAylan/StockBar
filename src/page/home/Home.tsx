@@ -21,6 +21,8 @@ const Home = () => {
     copyToClipboard,
     showCosts,
     toggleCosts,
+    forceAllBtl,
+    toggleForceAllBtl,
   } = useInventoryAnalysis();
 
   return (
@@ -55,7 +57,7 @@ const Home = () => {
             </span>
           )}
 
-          {/* 🎯 BOTÓN RESTAURADO */}
+          {/* 🎯 BOTÓN VER INFORME DETALLADO */}
           {jsonData && jsonData.length > 0 && (
             <button
               type="button"
@@ -84,16 +86,35 @@ const Home = () => {
               </div>
 
               <div className="flex flex-wrap items-center gap-2 print:hidden">
-                <select
-                  id="amount-filter"
-                  value={minAmountFilter}
-                  onChange={(e) => setMinAmountFilter(Number(e.target.value))}
-                  className="bg-white border border-neutral-300 hover:border-neutral-400 text-neutral-800 text-xs font-bold rounded-xl px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer transition-all"
+                {/* 🎯 BOTÓN PARA FORZAR TODO A BOTELLAS */}
+                <button
+                  type="button"
+                  onClick={toggleForceAllBtl}
+                  className={`px-3 py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 shadow-sm ${
+                    forceAllBtl
+                      ? "bg-amber-500 text-white border-amber-600 shadow-amber-500/20"
+                      : "bg-neutral-100 text-neutral-700 border-neutral-300 hover:bg-neutral-200"
+                  }`}
                 >
-                  <option value={0}>Filtrar Volumen: Todos</option>
-                  <option value={30}>Más de 30 ml</option>
-                  <option value={60}>Más de 60 ml</option>
-                </select>
+                  🍾{" "}
+                  {forceAllBtl
+                    ? "Mostrar en unidades"
+                    : "Mostrar en botellas"}{" "}
+                </button>
+
+                {/* 🎯 OCULTAR EL SELECTOR DE ML CUANDO FORCEALLBTL ESTÁ ACTIVADO */}
+                {!forceAllBtl && (
+                  <select
+                    id="amount-filter"
+                    value={minAmountFilter}
+                    onChange={(e) => setMinAmountFilter(Number(e.target.value))}
+                    className="bg-white border border-neutral-300 hover:border-neutral-400 text-neutral-800 text-xs font-bold rounded-xl px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer transition-all"
+                  >
+                    <option value={0}>Filtrar Volumen: Todos</option>
+                    <option value={30}>Más de 30 ml</option>
+                    <option value={60}>Más de 60 ml</option>
+                  </select>
+                )}
 
                 <button
                   type="button"
@@ -162,6 +183,7 @@ const Home = () => {
                     filteredItems={itemsFiltrados}
                     showCosts={showCosts}
                     editMode={editMode}
+                    forceAllBtl={forceAllBtl}
                     onDeleteItem={handleDeleteItem}
                   />
                 );

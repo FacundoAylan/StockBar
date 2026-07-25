@@ -6,8 +6,9 @@ interface InventoryItemRowProps {
   item: InventoryItem;
   itemIdx: number;
   groupIndex: number;
-  categoryName?: string; // 👈 1. Agregado como prop opcional
+  categoryName?: string;
   editMode: boolean;
+  forceAllBtl?: boolean; 
   onDeleteItem: (groupIndex: number, itemIndex: number) => void;
 }
 
@@ -15,8 +16,9 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
   item,
   itemIdx,
   groupIndex,
-  categoryName, // 👈 2. Desestructurado aquí
+  categoryName,
   editMode,
+  forceAllBtl = false, 
   onDeleteItem,
 }) => {
   const {
@@ -28,7 +30,7 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
     actNum,
     ventasStr,
     usoStr,
-  } = analyzeItem(item, categoryName); // 👈 3. Se pasa la categoría a analyzeItem
+  } = analyzeItem(item, categoryName, forceAllBtl); 
 
   return (
     <li className="py-3 flex flex-col sm:flex-row sm:items-center justify-between text-sm gap-2 px-2 rounded-lg avoid-break print:break-inside-avoid">

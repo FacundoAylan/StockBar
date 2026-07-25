@@ -9,6 +9,7 @@ interface CategoryGroupCardProps {
   showNegative?: boolean;
   showCosts: boolean;
   editMode: boolean;
+  forceAllBtl?: boolean; // 🎯 Se agrega prop opcional
   onDeleteItem: (groupIndex: number, itemIndex: number) => void;
 }
 
@@ -18,6 +19,7 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
   filteredItems,
   showCosts,
   editMode,
+  forceAllBtl = false,
   onDeleteItem,
 }) => {
   // 1. % DIFERENCIA
@@ -134,6 +136,7 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
             groupIndex={groupIndex}
             categoryName={group.categoria}
             editMode={editMode}
+            forceAllBtl={forceAllBtl}
             onDeleteItem={onDeleteItem}
           />
         ))}

@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent,  } from "react";
+import { useState, type ChangeEvent } from "react";
 import { csvToJson } from "../utils/csvParser";
 import {
   analyzeItem,
@@ -25,10 +25,14 @@ export function useInventoryAnalysis() {
   );
   const [copied, setCopied] = useState(false);
 
-  //Estado visible de costos
+  // Estado visible de costos
   const [showCosts, setShowCosts] = useState<boolean>(true);
 
+  // 🎯 Estado para forzar todo el inventario a Botellas (btl)
+  const [forceAllBtl, setForceAllBtl] = useState<boolean>(false);
+
   const toggleCosts = () => setShowCosts((prev) => !prev);
+  const toggleForceAllBtl = () => setForceAllBtl((prev) => !prev);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     event.stopPropagation();
@@ -66,7 +70,8 @@ export function useInventoryAnalysis() {
         const itemKey = `${groupIndex}-${itemIdx}`;
         if (ignoredItemKeys.has(itemKey)) return false;
 
-        const analysis = analyzeItem(item, categoryName);
+        // 🎯 Evaluamos el análisis respetando categoría y forceAllBtl
+        const analysis = analyzeItem(item, categoryName, forceAllBtl);
         const pctValue = parsePercentage(item.porcentajeDiferencia);
 
         // 1. Descartar si no tiene diferencia
@@ -79,8 +84,7 @@ export function useInventoryAnalysis() {
         }
 
         // 🎯 2. FILTRO POR VOLUMEN ESTRICTO:
-        // Solo aplica a 'ml'. Como 'Bebida s/Alcohol' ahora devuelve 'btl',
-        // pasa de largo y NUNCA se oculta.
+        // Si forceAllBtl es true, analysis.unit es "btl", por lo que no filtra nada.
         if (
           minAmountFilter > 0 &&
           analysis.unit === "ml" &&
@@ -102,6 +106,7 @@ export function useInventoryAnalysis() {
 
     jsonData.forEach((group, groupIdx) => {
       const itemsFiltrados = getFilteredItems(group.items, groupIdx);
+      const categoryName = group?.categoria ?? "";
 
       if (itemsFiltrados.length > 0) {
         let totalDiff = 0;
@@ -109,7 +114,8 @@ export function useInventoryAnalysis() {
         let mainUnit = "btl";
 
         itemsFiltrados.forEach(({ item }) => {
-          const analysis = analyzeItem(item);
+          // 🎯 Pasar categoryName y forceAllBtl para coincidir con la UI
+          const analysis = analyzeItem(item, categoryName, forceAllBtl);
           const prevNum = Math.abs(cleanNumber(item.existenciaPrevia));
 
           totalDiff += analysis.esFaltante
@@ -132,7 +138,8 @@ export function useInventoryAnalysis() {
         text += `${group.icono} ${group.categoria}: ${accionCat} ${valAbs} ${mainUnit}${pctCatStr}\n`;
 
         itemsFiltrados.forEach(({ item }) => {
-          const analysis = analyzeItem(item);
+          // 🎯 Pasar categoryName y forceAllBtl aquí también
+          const analysis = analyzeItem(item, categoryName, forceAllBtl);
           text += `• ${item.nombreArticulo}: ${analysis.accion} ${analysis.diffAmount} ${analysis.unit} — Ventas: ${analysis.ventasStr} | Uso real: ${analysis.usoStr}.\n`;
         });
 
@@ -173,5 +180,8 @@ export function useInventoryAnalysis() {
     showCosts,
     setShowCosts,
     toggleCosts,
+    forceAllBtl,
+    setForceAllBtl,
+    toggleForceAllBtl,
   };
 }

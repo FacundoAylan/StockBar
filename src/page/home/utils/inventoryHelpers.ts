@@ -35,7 +35,13 @@ export const parsePercentage = (pctStr: string | null | undefined): number => {
 export const detectUnit = (
   item: InventoryItem,
   categoryName?: string,
+  forceAllBtl: boolean = false,
 ): UnitType => {
+  // 🎯 Si el botón está activado, todo pasa automáticamente a 'btl'
+  if (forceAllBtl) {
+    return "btl";
+  }
+
   const categoryStr = (categoryName || "").toLowerCase();
   const nameStr = (item.nombreArticulo || "").toLowerCase();
   const textToTest = `${categoryStr} ${nameStr}`.toLowerCase();
@@ -110,6 +116,7 @@ export const detectUnit = (
 export const analyzeItem = (
   item: InventoryItem,
   categoryName?: string,
+  forceAllBtl: boolean = false,
 ): ItemAnalysis => {
   const rawUsado = cleanNumber(item.usado);
   const rawVendido = Math.abs(cleanNumber(item.vendido));
@@ -117,8 +124,8 @@ export const analyzeItem = (
   const rawPrevia = Math.abs(cleanNumber(item.existenciaPrevia));
   const rawActual = Math.abs(cleanNumber(item.existencia));
 
-  // 🎯 1. Pasamos la categoría a detectUnit para asignar 'btl', 'L' o 'ml' correctamente
-  const unit = detectUnit(item, categoryName);
+  // 🎯 1. Pasamos categoryName Y forceAllBtl a detectUnit
+  const unit = detectUnit(item, categoryName, forceAllBtl);
 
   const diffTrimmed = (item.diferencia || "").trim();
   const tieneDiferencia =
@@ -134,7 +141,7 @@ export const analyzeItem = (
   const diffAbs = Math.abs(rawDiff);
   const diffAmount = diffAbs || usadoAbs;
 
-  // 🎯 2. Determinación directa sin reasignaciones (resuelve el warning del linter)
+  // 🎯 2. Determinación directa sin reasignaciones
   const esFaltante =
     rawDiff !== 0
       ? esDiferenciaNegativa
