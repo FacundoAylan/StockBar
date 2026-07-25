@@ -46,8 +46,8 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
     );
   };
 
-  // 2. VARIACIÓN / DIFERENCIA
-  const renderVarianceBadge = (diferencia: string | null) => {
+  // 2. VARIACIÓN / DIFERENCIA (Acepta undefined)
+  const renderVarianceBadge = (diferencia?: string | null) => {
     if (!diferencia || diferencia === "0") return null;
     const cleanDiff = diferencia.trim();
     const esNegativo = cleanDiff.includes("-");
@@ -68,8 +68,8 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
     );
   };
 
-  // 3. IMPACTO DE COSTO
-  const renderCostImpactBadge = (diferenciaCosto: string | null) => {
+  // 3. IMPACTO DE COSTO (Acepta undefined)
+  const renderCostImpactBadge = (diferenciaCosto?: string | null) => {
     if (!diferenciaCosto) return null;
     const isNeg = diferenciaCosto.includes("-");
     const isPos = diferenciaCosto.includes("+");

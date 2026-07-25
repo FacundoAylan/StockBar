@@ -17,10 +17,16 @@ export interface InventoryItem {
 export interface InventoryGroup {
   categoria: string;
   icono?: string;
-  existenciaPrevia: string;
-  existencia: string;
-  diferencia: string;
-  diferenciaCosto: string;
+  existenciaPrevia?: string;
+  compras?: string; 
+  existencia?: string;
+  usado?: string;
+  vendido?: string;
+  diferencia?: string;
   porcentajeDiferencia?: string | number;
+  diferenciaCosto?: string;
+  ingresos?: string;
+  porcentajeCosto?: string | number;
+  porcentajeCostoIdeal?: string | number;
   items: InventoryItem[];
 }

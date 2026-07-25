@@ -62,22 +62,22 @@ export const csvToJson = (csv: string): InventoryGroup[] => {
         .replace(/:$/, "")
         .trim();
 
-      const categoryObject: InventoryGroup = {
-        categoria: cleanCategory,
-        icono: getCategoryIcon(cleanCategory),
-        existenciaPrevia: rowObj["existencia previa"] || null,
-        compras: rowObj["compras"] || null,
-        existencia: rowObj["existencia"] || null,
-        usado: rowObj["usado"] || null,
-        vendido: rowObj["vendido"] || null,
-        diferencia: rowObj["diferencia"] || null,
-        porcentajeDiferencia: rowObj["% diferencia"] || null,
-        diferenciaCosto: rowObj["diferencia (costo)"] || null,
-        ingresos: rowObj["ingresos"] || null,
-        porcentajeCosto: rowObj["porcentaje de costo"] || null,
-        porcentajeCostoIdeal: rowObj["porcentaje de costo ideal"] || null,
-        items: [...currentGroupItems],
-      };
+    const categoryObject: InventoryGroup = {
+      categoria: cleanCategory,
+      icono: getCategoryIcon(cleanCategory),
+      existenciaPrevia: rowObj["existencia previa"] || "",
+      compras: rowObj["compras"] || "",
+      existencia: rowObj["existencia"] || "",
+      usado: rowObj["usado"] || "",
+      vendido: rowObj["vendido"] || "",
+      diferencia: rowObj["diferencia"] || "",
+      porcentajeDiferencia: rowObj["% diferencia"] || undefined,
+      diferenciaCosto: rowObj["diferencia (costo)"] || "",
+      ingresos: rowObj["ingresos"] || "",
+      porcentajeCosto: rowObj["porcentaje de costo"] || undefined,
+      porcentajeCostoIdeal: rowObj["porcentaje de costo ideal"] || undefined,
+      items: [...currentGroupItems],
+    };
 
       objList.push(categoryObject);
       currentGroupItems = []; // Reset item pool for next category
