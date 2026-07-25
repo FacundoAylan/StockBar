@@ -65,8 +65,10 @@ export function useInventoryAnalysis() {
         nextUnit = "btl";
       } else if (currentUnit === "btl") {
         nextUnit = "L";
+      } else if (currentUnit === "L") {
+        nextUnit = "un";
       } else {
-        nextUnit = "ml"; // Si era 'L' (o cualquier otro valor)
+        nextUnit = "ml";
       }
 
       // 3. Asignamos la nueva unidad manual

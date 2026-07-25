@@ -15,7 +15,7 @@ const Home = () => {
     setEditMode,
     copied,
     handleFileChange,
-    handleRemoveFile, // 👈 🎯 1. Extraemos la función de eliminación
+    handleRemoveFile,
     handleDeleteItem,
     handleToggleUnit,
     getFilteredItems,

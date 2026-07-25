@@ -91,7 +91,8 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
               {/* Muestra la Siguiente Unidad a aplicar */}
               {unit === "ml" && " Cambiar a Btl"}
               {unit === "btl" && " Cambiar a L"}
-              {unit === "L" && " Cambiar a ml"}
+              {unit === "L" && " Cambiar a Unidad"}
+              {unit === "un" && " Cambiar a ml"}
             </button>
 
             {/* Botón Borrar */}
