@@ -60,6 +60,7 @@ export const detectUnit = (
     hasWord(textToTest, "espresso") ||
     hasWord(textToTest, "martini") ||
     hasWord(textToTest, "cinzano") ||
+    hasWord(textToTest, "canela") ||
     textToTest.includes("cold brew")
   ) {
     return "ml";
