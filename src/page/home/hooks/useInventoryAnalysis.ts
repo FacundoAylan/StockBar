@@ -57,17 +57,20 @@ export function useInventoryAnalysis() {
   ) => {
     if (!items) return [];
 
+    // 🎯 Obtenemos el nombre de la categoría del grupo actual si existe en tu estado
+    const categoryName = jsonData?.[groupIndex]?.categoria;
+
     return items
       .map((item, itemIdx) => ({ item, itemIdx }))
       .filter(({ item, itemIdx }) => {
-        // 1. Ignorar ítems borrados manualmente
         const itemKey = `${groupIndex}-${itemIdx}`;
         if (ignoredItemKeys.has(itemKey)) return false;
 
-        const analysis = analyzeItem(item);
+        // 🎯 IMPORTANTE: Pasar categoryName como segundo argumento
+        const analysis = analyzeItem(item, categoryName);
         const pctValue = parsePercentage(item.porcentajeDiferencia);
 
-        // 2. Solo descartar si NO tiene ninguna diferencia de stock/uso
+        // 1. Descartar si no tiene diferencia
         if (
           !analysis.tieneDiferencia &&
           !analysis.esUsadoNegativo &&
@@ -76,19 +79,20 @@ export function useInventoryAnalysis() {
           return false;
         }
 
-        // 3. Filtro por volumen en ml/L (si está activo)
+        // 🎯 2. FILTRO POR VOLUMEN ESTRICTO:
+        // Solo aplica si minAmountFilter es mayor a 0 Y la unidad es estrictamente 'ml'
         if (
-          (analysis.unit === "ml" || analysis.unit === "L") &&
           minAmountFilter > 0 &&
+          analysis.unit === "ml" &&
           analysis.diffAmount < minAmountFilter
         ) {
           return false;
         }
 
-        // 4. Filtro por % mínimo (sin discriminar si es positivo o negativo)
         return pctValue >= minPercentageFilter;
       });
   };
+
   const generateGmailText = () => {
     if (!jsonData) return "";
 
