@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useFileParser } from "./useFileParser";
 import { useInventoryFilters } from "./useInventoryFilters";
 import { useGmailReport } from "./useGmailReport";
-import { detectUnit } from "../utils/inventoryHelpers";
+import { detectUnit, type UnitType } from "../utils/inventoryHelpers";
 import type { InventoryItem } from "../../../types/inventory";
 
 export function useInventoryAnalysis() {
@@ -53,11 +53,24 @@ export function useInventoryAnalysis() {
       const newData = structuredClone(prevData);
       const group = newData[groupIndex];
       const item = group.items[itemIndex] as InventoryItem & {
-        manualUnit?: string;
+        manualUnit?: UnitType;
       };
 
+      // 1. Obtenemos la unidad que tiene actualmente (automática o manual anterior)
       const currentUnit = detectUnit(item, group.categoria, forceAllBtl);
-      item.manualUnit = currentUnit === "btl" ? "ml" : "btl";
+
+      // 2. Rotación cíclica de 3 vías: ml ➔ btl ➔ L ➔ ml
+      let nextUnit: UnitType;
+      if (currentUnit === "ml") {
+        nextUnit = "btl";
+      } else if (currentUnit === "btl") {
+        nextUnit = "L";
+      } else {
+        nextUnit = "ml"; // Si era 'L' (o cualquier otro valor)
+      }
+
+      // 3. Asignamos la nueva unidad manual
+      item.manualUnit = nextUnit;
 
       return newData;
     });

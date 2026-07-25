@@ -37,12 +37,7 @@ export const detectUnit = (
   categoryName?: string,
   forceAllBtl: boolean = false,
 ): UnitType => {
-  // 1. Prioridad Máxima Global: Si el switch global está activo, forzar todo a 'btl'
-  if (forceAllBtl) {
-    return "btl";
-  }
-
-  // 🎯 2. Prioridad Manual: Si el usuario cambió la unidad manualmente en modo edición
+  // 🎯 1. Prioridad Manual: Selección explícita del usuario en modo edición
   if (item.manualUnit) {
     return item.manualUnit as UnitType;
   }
@@ -51,15 +46,32 @@ export const detectUnit = (
   const nameStr = (item.nombreArticulo || "").toLowerCase();
   const textToTest = `${categoryStr} ${nameStr}`.toLowerCase();
 
-  // 3. REGLA: LITROS / BARRIL (Kegs, Chopp, Cerveza Tirada)
+  // 🎯 2. REGLA: CAFÉ / COLD BREW / INFUSIONES (Fuerza siempre a 'ml')
+  if (
+    textToTest.includes("cafe") ||
+    textToTest.includes("café") ||
+    textToTest.includes("espresso") ||
+    textToTest.includes("cold brew")
+  ) {
+    return "ml";
+  }
+
+  // 🎯 3. REGLA: LITROS / BARRIL / GRIFO (Kegs, Chopp, Cerveza Tirada, Vermut de Grifo)
   if (
     textToTest.includes("keg") ||
     textToTest.includes("barril") ||
     textToTest.includes("chopp") ||
     textToTest.includes("tirada") ||
-    textToTest.includes("draft")
+    textToTest.includes("draft") ||
+    textToTest.includes("grifo") ||
+    textToTest.includes("proyecto")
   ) {
     return "L";
+  }
+
+  // 🎯 3. Override Global: Forzar a botellas todo lo demás que NO sea barril
+  if (forceAllBtl) {
+    return "btl";
   }
 
   // 4. REGLA PRINCIPAL DE BOTELLAS Y UNIDADES (PRIORIDAD ALTA)
@@ -95,8 +107,13 @@ export const detectUnit = (
     textToTest.includes("champagne") ||
     textToTest.includes("espumante") ||
     textToTest.includes("espumoso") ||
+    textToTest.includes("vermu") ||
+    textToTest.includes("vermut") ||
+    textToTest.includes("vermouth") ||
     textToTest.includes("porron") ||
     textToTest.includes("porrón") ||
+    textToTest.includes("cerveza") ||
+    textToTest.includes("cervezas") ||
     textToTest.includes("sidra") ||
     // ENERGIZANTES Y LATAS
     textToTest.includes("energizante") ||
@@ -115,7 +132,7 @@ export const detectUnit = (
 
   // 5. REGLA POR DEFECTO: Destilados / Licores / Coctelería a granel
   return "ml";
-};
+};;
 
 export const analyzeItem = (
   item: InventoryItem,

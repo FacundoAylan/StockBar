@@ -81,14 +81,17 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
         {/* 🎯 BOTONES DE MODO EDICIÓN */}
         {editMode && (
           <div className="flex items-center gap-1.5 ml-2 print:hidden">
-            {/* Botón para alternar unidad individual (Botella vs Caja/ml) */}
+            {/* Botón para cambiar a la siguiente unidad (ml ➔ btl ➔ L ➔ ml) */}
             <button
               type="button"
               onClick={() => onToggleUnit(groupIndex, itemIdx)}
-              className="text-amber-700 hover:text-amber-900 font-bold bg-amber-50 hover:bg-amber-100 p-1.5 rounded-lg transition-colors border border-amber-200 cursor-pointer"
-              title={`Unidad actual: ${unit}. Clic para alternar (btl ↔ ml)`}
+              className="text-amber-700 hover:text-amber-900 font-bold bg-amber-50 hover:bg-amber-100 p-1.5 rounded-lg transition-colors border border-amber-200 cursor-pointer text-xs flex items-center gap-1"
+              title={`Unidad actual: ${unit}. Clic para cambiar a la siguiente.`}
             >
-              {unit === "btl" ? "🍾" : "📦"}
+              {/* Muestra la Siguiente Unidad a aplicar */}
+              {unit === "ml" && " Cambiar a Btl"}
+              {unit === "btl" && " Cambiar a L"}
+              {unit === "L" && " Cambiar a ml"}
             </button>
 
             {/* Botón Borrar */}
