@@ -120,6 +120,7 @@ export const detectUnit = (
     hasWord(textToTest, "champagne") ||
     hasWord(textToTest, "espumante") ||
     hasWord(textToTest, "espumoso") ||
+    hasWord(textToTest, "spritz") ||
     hasWord(textToTest, "vermu") ||
     hasWord(textToTest, "vermut") ||
     hasWord(textToTest, "vermouth") ||
@@ -139,7 +140,7 @@ export const detectUnit = (
     hasWord(textToTest, "botella") ||
     hasWord(textToTest, "bot") ||
     hasWord(textToTest, "lata") ||
-    hasWord(textToTest, "can") 
+    hasWord(textToTest, "can")
   ) {
     return "btl";
   }
