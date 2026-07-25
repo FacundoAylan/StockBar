@@ -40,7 +40,7 @@ export const detectUnit = (
   const nameStr = (item.nombreArticulo || "").toLowerCase();
   const textToTest = `${categoryStr} ${nameStr}`.toLowerCase();
 
-  // 1. REGLA: LITROS (Kegs, Barriles, Chopp, Cerveza Tirada)
+  // 1. REGLA: LITROS / BARRIL (Kegs, Chopp, Cerveza Tirada)
   if (
     textToTest.includes("keg") ||
     textToTest.includes("barril") ||
@@ -51,17 +51,21 @@ export const detectUnit = (
     return "L";
   }
 
-  // 2. REGLA: BOTELLAS (Vinos, Champagnes, Porrones, Gaseosas, Energizantes)
+  // 2. REGLA PRINCIPAL DE BOTELLAS Y UNIDADES (PRIORIDAD ALTA)
+  // Todo lo que encaje aquí SERÁ BOTELLA ('btl') aunque en el nombre diga '500ml' o '350ml'
   if (
-    textToTest.includes("vino") ||
-    textToTest.includes("wine") ||
-    textToTest.includes("champagne") ||
-    textToTest.includes("espumante") ||
-    textToTest.includes("espumoso") ||
-    textToTest.includes("porron") ||
-    textToTest.includes("porrón") ||
-    textToTest.includes("sidra") ||
-    // 🎯 REGLAS PARA GASEOSAS Y REFRESCOS
+    // AGUAS Y BEBIDAS SIN ALCOHOL
+    textToTest.includes("agua") ||
+    textToTest.includes("aguas") ||
+    textToTest.includes("water") ||
+    textToTest.includes("mineral") ||
+    textToTest.includes("bebida s/alcohol") ||
+    textToTest.includes("bebidas s/alcohol") ||
+    textToTest.includes("sin alcohol") ||
+    textToTest.includes("s/alcohol") ||
+    textToTest.includes("s/alc") ||
+    textToTest.includes("sin alc") ||
+    // GASEOSAS Y REFRESCOS
     textToTest.includes("gaseosa") ||
     textToTest.includes("gaseosas") ||
     textToTest.includes("soda") ||
@@ -75,27 +79,31 @@ export const detectUnit = (
     textToTest.includes("tónica") ||
     textToTest.includes("tonica") ||
     textToTest.includes("paso de los toros") ||
-    // ENERGIZANTES
+    // VINOS Y ESPUMANTES
+    textToTest.includes("vino") ||
+    textToTest.includes("wine") ||
+    textToTest.includes("champagne") ||
+    textToTest.includes("espumante") ||
+    textToTest.includes("espumoso") ||
+    textToTest.includes("porron") ||
+    textToTest.includes("porrón") ||
+    textToTest.includes("sidra") ||
+    // ENERGIZANTES Y LATAS
     textToTest.includes("energizante") ||
     textToTest.includes("energy") ||
     textToTest.includes("red bull") ||
     textToTest.includes("monster") ||
-    textToTest.includes("speed")
-  ) {
-    return "btl";
-  }
-
-  // 3. REGLA: BOTELLAS EXPLÍCITAS (si la celda o el ítem contienen 'btl', 'botella', 'lata')
-  if (
+    textToTest.includes("speed") ||
+    // PALABRAS CLAVE DIRECTAS DE CONTENEDOR
     textToTest.includes("btl") ||
     textToTest.includes("botella") ||
-    textToTest.includes("can") ||
-    textToTest.includes("lata")
+    textToTest.includes("lata") ||
+    textToTest.includes("can")
   ) {
     return "btl";
   }
 
-  // 4. REGLA POR DEFECTO: Destilados / Licores en ML
+  // 3. REGLA POR DEFECTO: Destilados / Licores / Coctelería a granel
   return "ml";
 };
 

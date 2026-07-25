@@ -57,8 +57,8 @@ export function useInventoryAnalysis() {
   ) => {
     if (!items) return [];
 
-    // 🎯 Obtenemos el nombre de la categoría del grupo actual si existe en tu estado
-    const categoryName = jsonData?.[groupIndex]?.categoria;
+    const group = jsonData?.[groupIndex];
+    const categoryName = group?.categoria ?? "";
 
     return items
       .map((item, itemIdx) => ({ item, itemIdx }))
@@ -66,7 +66,6 @@ export function useInventoryAnalysis() {
         const itemKey = `${groupIndex}-${itemIdx}`;
         if (ignoredItemKeys.has(itemKey)) return false;
 
-        // 🎯 IMPORTANTE: Pasar categoryName como segundo argumento
         const analysis = analyzeItem(item, categoryName);
         const pctValue = parsePercentage(item.porcentajeDiferencia);
 
@@ -80,7 +79,8 @@ export function useInventoryAnalysis() {
         }
 
         // 🎯 2. FILTRO POR VOLUMEN ESTRICTO:
-        // Solo aplica si minAmountFilter es mayor a 0 Y la unidad es estrictamente 'ml'
+        // Solo aplica a 'ml'. Como 'Bebida s/Alcohol' ahora devuelve 'btl',
+        // pasa de largo y NUNCA se oculta.
         if (
           minAmountFilter > 0 &&
           analysis.unit === "ml" &&
