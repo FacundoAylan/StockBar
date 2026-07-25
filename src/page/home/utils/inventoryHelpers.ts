@@ -32,6 +32,13 @@ export const parsePercentage = (pctStr: string | null | undefined): number => {
   return isNaN(num) ? 0 : Math.abs(num);
 };
 
+// Helper para verificar si el texto contiene la palabra exacta (case-insensitive)
+const hasWord = (text: string, word: string): boolean => {
+  // \b garantiza los límites de la palabra exactos
+  const regex = new RegExp(`\\b${word}\\b`, "i");
+  return regex.test(text);
+};
+
 export const detectUnit = (
   item: InventoryItem,
   categoryName?: string,
@@ -48,39 +55,41 @@ export const detectUnit = (
 
   // 🎯 2. REGLA: CAFÉ / COLD BREW / INFUSIONES (Fuerza siempre a 'ml')
   if (
-    textToTest.includes("cafe") ||
-    textToTest.includes("café") ||
-    textToTest.includes("espresso") ||
-    textToTest.includes("cold brew")
+    hasWord(textToTest, "cafe") ||
+    hasWord(textToTest, "café") ||
+    hasWord(textToTest, "espresso") ||
+    textToTest.includes("cold brew") ||
+    hasWord(textToTest, "martini")
   ) {
     return "ml";
   }
 
-  // 🎯 3. REGLA: LITROS / BARRIL / GRIFO (Kegs, Chopp, Cerveza Tirada, Vermut de Grifo)
+  // 🎯 3. REGLA: LITROS / BARRIL / GRIFO (Kegs, Chopp, Cerveza Tirada, Vermut de Grifo, Proyectos)
   if (
-    textToTest.includes("keg") ||
-    textToTest.includes("barril") ||
-    textToTest.includes("chopp") ||
-    textToTest.includes("tirada") ||
-    textToTest.includes("draft") ||
-    textToTest.includes("grifo") ||
-    textToTest.includes("proyecto")
+    hasWord(textToTest, "keg") ||
+    hasWord(textToTest, "kegs") ||
+    hasWord(textToTest, "barril") ||
+    hasWord(textToTest, "chopp") ||
+    hasWord(textToTest, "tirada") ||
+    hasWord(textToTest, "draft") ||
+    hasWord(textToTest, "grifo") ||
+    hasWord(textToTest, "proyecto")
   ) {
     return "L";
   }
 
-  // 🎯 3. Override Global: Forzar a botellas todo lo demás que NO sea barril
+  // 🎯 4. Override Global: Forzar a botellas todo lo demás que NO sea barril ni café
   if (forceAllBtl) {
     return "btl";
   }
 
-  // 4. REGLA PRINCIPAL DE BOTELLAS Y UNIDADES (PRIORIDAD ALTA)
+  // 🎯 5. REGLA PRINCIPAL DE BOTELLAS Y UNIDADES (PRIORIDAD ALTA)
   if (
     // AGUAS Y BEBIDAS SIN ALCOHOL
-    textToTest.includes("agua") ||
-    textToTest.includes("aguas") ||
-    textToTest.includes("water") ||
-    textToTest.includes("mineral") ||
+    hasWord(textToTest, "agua") ||
+    hasWord(textToTest, "aguas") ||
+    hasWord(textToTest, "water") ||
+    hasWord(textToTest, "mineral") ||
     textToTest.includes("bebida s/alcohol") ||
     textToTest.includes("bebidas s/alcohol") ||
     textToTest.includes("sin alcohol") ||
@@ -88,51 +97,52 @@ export const detectUnit = (
     textToTest.includes("s/alc") ||
     textToTest.includes("sin alc") ||
     // GASEOSAS Y REFRESCOS
-    textToTest.includes("gaseosa") ||
-    textToTest.includes("gaseosas") ||
-    textToTest.includes("soda") ||
-    textToTest.includes("refresco") ||
-    textToTest.includes("coca") ||
-    textToTest.includes("sprite") ||
-    textToTest.includes("fanta") ||
-    textToTest.includes("7up") ||
-    textToTest.includes("sevenup") ||
-    textToTest.includes("schweppes") ||
-    textToTest.includes("tónica") ||
-    textToTest.includes("tonica") ||
+    hasWord(textToTest, "gaseosa") ||
+    hasWord(textToTest, "gaseosas") ||
+    hasWord(textToTest, "soda") ||
+    hasWord(textToTest, "refresco") ||
+    hasWord(textToTest, "coca") ||
+    hasWord(textToTest, "sprite") ||
+    hasWord(textToTest, "fanta") ||
+    hasWord(textToTest, "7up") ||
+    hasWord(textToTest, "sevenup") ||
+    hasWord(textToTest, "schweppes") ||
+    hasWord(textToTest, "tónica") ||
+    hasWord(textToTest, "tonica") ||
     textToTest.includes("paso de los toros") ||
-    // VINOS Y ESPUMANTES
-    textToTest.includes("vino") ||
-    textToTest.includes("wine") ||
-    textToTest.includes("champagne") ||
-    textToTest.includes("espumante") ||
-    textToTest.includes("espumoso") ||
-    textToTest.includes("vermu") ||
-    textToTest.includes("vermut") ||
-    textToTest.includes("vermouth") ||
-    textToTest.includes("porron") ||
-    textToTest.includes("porrón") ||
-    textToTest.includes("cerveza") ||
-    textToTest.includes("cervezas") ||
-    textToTest.includes("sidra") ||
+    // VINOS, VERMUTS, CERVEZAS Y ESPUMANTES
+    hasWord(textToTest, "vino") ||
+    hasWord(textToTest, "wine") ||
+    hasWord(textToTest, "champagne") ||
+    hasWord(textToTest, "espumante") ||
+    hasWord(textToTest, "espumoso") ||
+    hasWord(textToTest, "vermu") ||
+    hasWord(textToTest, "vermut") ||
+    hasWord(textToTest, "vermouth") ||
+    hasWord(textToTest, "porron") ||
+    hasWord(textToTest, "porrón") ||
+    hasWord(textToTest, "cerveza") ||
+    hasWord(textToTest, "cervezas") ||
+    hasWord(textToTest, "sidra") ||
     // ENERGIZANTES Y LATAS
-    textToTest.includes("energizante") ||
-    textToTest.includes("energy") ||
+    hasWord(textToTest, "energizante") ||
+    hasWord(textToTest, "energy") ||
     textToTest.includes("red bull") ||
-    textToTest.includes("monster") ||
-    textToTest.includes("speed") ||
+    hasWord(textToTest, "monster") ||
+    hasWord(textToTest, "speed") ||
     // PALABRAS CLAVE DIRECTAS DE CONTENEDOR
-    textToTest.includes("btl") ||
-    textToTest.includes("botella") ||
-    textToTest.includes("lata") ||
-    textToTest.includes("can")
+    hasWord(textToTest, "btl") ||
+    hasWord(textToTest, "botella") ||
+    hasWord(textToTest, "bot") ||
+    hasWord(textToTest, "lata") ||
+    hasWord(textToTest, "can") 
   ) {
     return "btl";
   }
 
-  // 5. REGLA POR DEFECTO: Destilados / Licores / Coctelería a granel
+  // 🎯 6. REGLA POR DEFECTO: Destilados / Licores / Coctelería a granel
   return "ml";
-};;
+};
 
 export const analyzeItem = (
   item: InventoryItem,
