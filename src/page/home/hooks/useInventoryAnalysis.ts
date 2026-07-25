@@ -60,15 +60,23 @@ export function useInventoryAnalysis() {
     return items
       .map((item, itemIdx) => ({ item, itemIdx }))
       .filter(({ item, itemIdx }) => {
+        // 1. Ignorar ítems borrados manualmente
         const itemKey = `${groupIndex}-${itemIdx}`;
         if (ignoredItemKeys.has(itemKey)) return false;
 
         const analysis = analyzeItem(item);
         const pctValue = parsePercentage(item.porcentajeDiferencia);
 
-        if (!analysis.tieneDiferencia && !analysis.esUsadoNegativo)
+        // 2. Solo descartar si NO tiene ninguna diferencia de stock/uso
+        if (
+          !analysis.tieneDiferencia &&
+          !analysis.esUsadoNegativo &&
+          analysis.diffAmount === 0
+        ) {
           return false;
+        }
 
+        // 3. Filtro por volumen en ml/L (si está activo)
         if (
           (analysis.unit === "ml" || analysis.unit === "L") &&
           minAmountFilter > 0 &&
@@ -77,13 +85,10 @@ export function useInventoryAnalysis() {
           return false;
         }
 
-        const coincideTipo = showNegative
-          ? analysis.esUsadoNegativo
-          : !analysis.esUsadoNegativo;
-        return coincideTipo && pctValue >= minPercentageFilter;
+        // 4. Filtro por % mínimo (sin discriminar si es positivo o negativo)
+        return pctValue >= minPercentageFilter;
       });
   };
-
   const generateGmailText = () => {
     if (!jsonData) return "";
 

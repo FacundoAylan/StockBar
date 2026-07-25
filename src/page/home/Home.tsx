@@ -11,8 +11,6 @@ const Home = () => {
     setShowTextModal,
     minAmountFilter,
     setMinAmountFilter,
-    showNegative,
-    setShowNegative,
     editMode,
     setEditMode,
     copied,
@@ -22,12 +20,12 @@ const Home = () => {
     generateGmailText,
     copyToClipboard,
     showCosts,
-    toggleCosts
+    toggleCosts,
   } = useInventoryAnalysis();
 
   return (
     <main className="min-h-screen bg-neutral-950 text-white flex flex-col items-center justify-center p-4 print:bg-white print:p-0 print:block print:min-h-0">
-      {/* Carga CSV */}
+      {/* Carga CSV (Tarjeta Inicial) */}
       <div className="w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-6 text-center print:hidden">
         <h1 className="text-4xl font-extrabold tracking-tight text-red-500 uppercase">
           ¡Informes, afuera!
@@ -57,6 +55,7 @@ const Home = () => {
             </span>
           )}
 
+          {/* 🎯 BOTÓN RESTAURADO */}
           {jsonData && jsonData.length > 0 && (
             <button
               type="button"
@@ -85,20 +84,6 @@ const Home = () => {
               </div>
 
               <div className="flex flex-wrap items-center gap-2 print:hidden">
-                <button
-                  type="button"
-                  onClick={() => setShowNegative(!showNegative)}
-                  className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all border flex items-center gap-1.5 cursor-pointer shadow-sm ${
-                    showNegative
-                      ? "bg-emerald-100 text-emerald-800 border-emerald-300 hover:bg-emerald-200"
-                      : "bg-rose-100 text-rose-800 border-rose-300 hover:bg-rose-200"
-                  }`}
-                >
-                  {showNegative
-                    ? "🟢 Ver Informe General / Sobrantes"
-                    : "🔴 Ver Usados Negativos"}
-                </button>
-
                 <select
                   id="amount-filter"
                   value={minAmountFilter}
@@ -175,7 +160,6 @@ const Home = () => {
                     group={group}
                     groupIndex={groupIndex}
                     filteredItems={itemsFiltrados}
-                    showNegative={showNegative}
                     showCosts={showCosts}
                     editMode={editMode}
                     onDeleteItem={handleDeleteItem}
@@ -203,8 +187,7 @@ const Home = () => {
           <div className="bg-white text-neutral-900 rounded-2xl shadow-2xl w-full max-w-2xl p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b pb-3">
               <h3 className="text-lg font-bold text-neutral-800 flex items-center gap-2">
-                ✉️ Resumen Redactado (
-                {showNegative ? "Usados Negativos" : "General / Sobrantes"})
+                ✉️ Resumen Redactado
               </h3>
               <button
                 type="button"
@@ -247,6 +230,6 @@ const Home = () => {
       )}
     </main>
   );
-}
+};
 
 export default Home;

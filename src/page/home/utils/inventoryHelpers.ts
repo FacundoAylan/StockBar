@@ -126,9 +126,14 @@ export const analyzeItem = (
   const diffAbs = Math.abs(rawDiff);
   const diffAmount = diffAbs || usadoAbs;
 
-  const esFaltante = esDiferenciaNegativa || esUsadoNegativo;
+  // 🎯 2. Determinación directa sin reasignaciones (resuelve el warning del linter)
+  const esFaltante =
+    rawDiff !== 0
+      ? esDiferenciaNegativa
+      : rawUsado !== 0
+        ? !esUsadoNegativo
+        : rawActual < rawPrevia;
 
-  // Sin signos de '+' o '-'
   const signo = "";
   const accion = esFaltante ? "Faltan" : "Sobran";
 

@@ -6,7 +6,7 @@ interface CategoryGroupCardProps {
   group: InventoryGroup;
   groupIndex: number;
   filteredItems: Array<{ item: InventoryGroup["items"][0]; itemIdx: number }>;
-  showNegative: boolean;
+  showNegative?: boolean;
   showCosts: boolean;
   editMode: boolean;
   onDeleteItem: (groupIndex: number, itemIndex: number) => void;
@@ -16,40 +16,59 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
   group,
   groupIndex,
   filteredItems,
-  showNegative,
   showCosts,
   editMode,
   onDeleteItem,
 }) => {
+  // 1. % DIFERENCIA
+  const renderPercentageBadge = (porcentaje?: string | number | null) => {
+    if (porcentaje === undefined || porcentaje === null || porcentaje === "")
+      return null;
+
+    const pctStr = String(porcentaje).replace("%", "").trim();
+    const pctNum = parseFloat(pctStr);
+
+    if (isNaN(pctNum) || pctNum === 0) return null;
+
+    const esNegativo = pctNum < 0;
+
+    return (
+      <span
+        className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${
+          esNegativo
+            ? "bg-rose-50 text-rose-700 border-rose-200"
+            : "bg-emerald-50 text-emerald-700 border-emerald-200"
+        }`}
+      >
+        % Diferencia {esNegativo ? "" : "+"}
+        {pctNum}%
+      </span>
+    );
+  };
+
+  // 2. VARIACIÓN / DIFERENCIA
   const renderVarianceBadge = (diferencia: string | null) => {
     if (!diferencia || diferencia === "0") return null;
     const cleanDiff = diferencia.trim();
     const esNegativo = cleanDiff.includes("-");
 
-    if (!showNegative) {
-      return (
-        <span
-          className={`text-xs font-bold px-3 py-1 rounded-full border ${
-            esNegativo
-              ? "bg-rose-100 text-rose-800 border-rose-200"
-              : "bg-emerald-100 text-emerald-800 border-emerald-200"
-          }`}
-        >
-          Variación{" "}
-          {cleanDiff.startsWith("+") || cleanDiff.startsWith("-")
-            ? cleanDiff
-            : `+${cleanDiff}`}
-        </span>
-      );
-    }
-
     return (
-      <span className="bg-rose-100 text-rose-800 text-xs font-bold px-3 py-1 rounded-full border border-rose-200">
-        Usado Negativo {cleanDiff}
+      <span
+        className={`text-xs font-bold px-3 py-1 rounded-full border ${
+          esNegativo
+            ? "bg-rose-100 text-rose-800 border-rose-200"
+            : "bg-emerald-100 text-emerald-800 border-emerald-200"
+        }`}
+      >
+        Variación{" "}
+        {cleanDiff.startsWith("+") || cleanDiff.startsWith("-")
+          ? cleanDiff
+          : `+${cleanDiff}`}
       </span>
     );
   };
 
+  // 3. IMPACTO DE COSTO
   const renderCostImpactBadge = (diferenciaCosto: string | null) => {
     if (!diferenciaCosto) return null;
     const isNeg = diferenciaCosto.includes("-");
@@ -83,14 +102,14 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
 
           <div className="flex items-center gap-3 text-xs text-neutral-600 mt-1 pl-8 font-medium">
             <span>
-              Previa:{" "}
+              Exist. Previa:{" "}
               <strong className="text-neutral-900 bg-neutral-200 px-1.5 py-0.5 rounded">
                 {group.existenciaPrevia || "0"}
               </strong>
             </span>
             <span>•</span>
             <span>
-              Actual:{" "}
+              Exist. Actual:{" "}
               <strong className="text-neutral-900 bg-neutral-200 px-1.5 py-0.5 rounded">
                 {group.existencia || "0"}
               </strong>
@@ -98,11 +117,14 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        {/* 🎯 MÉTRICAS Y BADGES JUNTOS EN UN SOLO LUGAR */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {renderPercentageBadge(group.porcentajeDiferencia)}
           {showCosts && renderCostImpactBadge(group.diferenciaCosto)}
           {renderVarianceBadge(group.diferencia)}
         </div>
       </div>
+
       <ul className="divide-y divide-neutral-200/60">
         {filteredItems.map(({ item, itemIdx }) => (
           <InventoryItemRow
