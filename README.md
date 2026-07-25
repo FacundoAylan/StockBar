@@ -24,6 +24,21 @@ Una aplicación web moderna y eficiente desarrollada en **React**, **TypeScript*
 * ✏️ **Edición rápida:** Elimina ítems irrestrictos o no deseados antes de generar el informe final.
 * ✉️ **Generador de texto para Gmail:** Formatea automáticamente el reporte con un solo clic para copiar y pegar en un correo.
 * 🖨️ **Exportación a PDF / Impresión:** Estilos optimizados con media queries de impresión para generar PDFs limpios.
+### ✏️ Edición e Interacción con Ítems
+
+El reporte permite realizar ajustes en tiempo real sobre los datos procesados sin necesidad de modificar el archivo CSV original:
+
+* **Modo Edición (`✏️ Editar Ítems`)**:
+  * Activa la posibilidad de descartar elementos individuales de la lista.
+  * Oculta los elementos seleccionados del cálculo visual del informe y de las métricas exportables.
+
+* **Alternar Unidades Individuales (`🍾 ↔ 📦`)**:
+  * **Cambio Manual por Ítem**: Al estar en *Modo Edición*, cada producto cuenta con un botón interactivo que permite alternar la unidad de medida individualmente entre **Botellas (`btl`)** y **Mililitros (`ml`)**.
+  * **Persistencia Local**: La interfaz ajusta automáticamente la interpretación del volumen y la presentación del faltante/sobrante según la unidad seleccionada.
+
+* **Visualización Global de Botellas (`🍾 Mostrar en botellas`)**:
+  * Un botón global de acción rápida que permite forzar temporalmente la conversión y visualización de **todo el inventario a unidades de botella**.
+  * Al desactivarlo, el sistema restaura los valores originales o las unidades personalizadas manualmente.
 
 ---
 

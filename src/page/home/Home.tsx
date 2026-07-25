@@ -15,6 +15,7 @@ const Home = () => {
     setEditMode,
     copied,
     handleFileChange,
+    handleRemoveFile, // 👈 🎯 1. Extraemos la función de eliminación
     handleDeleteItem,
     handleToggleUnit,
     getFilteredItems,
@@ -38,12 +39,24 @@ const Home = () => {
         </p>
 
         <div className="w-full flex flex-col gap-3 items-center mt-2">
-          <label
-            htmlFor="file-upload"
-            className="w-full py-3 px-6 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl cursor-pointer flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-red-600/30"
-          >
-            {fileName ? "Cambiar Archivo" : "Subir Archivo CSV"}
-          </label>
+          {/* 🎯 Mostrar "Subir Archivo" o "Eliminar Archivo" dinámicamente */}
+          {!fileName ? (
+            <label
+              htmlFor="file-upload"
+              className="w-full py-3 px-6 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl cursor-pointer flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-red-600/30"
+            >
+              Subir Archivo CSV
+            </label>
+          ) : (
+            <button
+              type="button"
+              onClick={handleRemoveFile}
+              className="w-full py-3 px-6 bg-rose-950/80 hover:bg-rose-900 text-rose-300 hover:text-rose-100 font-bold rounded-xl border border-rose-800/50 cursor-pointer flex items-center justify-center gap-2 transition-all shadow-lg"
+            >
+              🗑️ Eliminar Archivo
+            </button>
+          )}
+
           <input
             id="file-upload"
             type="file"
