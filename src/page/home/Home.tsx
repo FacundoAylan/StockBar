@@ -31,11 +31,12 @@ const Home = () => {
     <main className="min-h-screen bg-neutral-950 text-white flex flex-col items-center justify-center p-4 print:bg-white print:p-0 print:block print:min-h-0">
       {/* Carga CSV (Tarjeta Inicial) */}
       <div className="w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-6 text-center print:hidden">
-        <h1 className="text-4xl font-extrabold tracking-tight text-red-500 uppercase">
-          ¡Informes, afuera!
+        <h1 className="text-3xl font-bold tracking-tight text-neutral-800 dark:text-neutral-100 uppercase">
+          Módulo de Reportes
         </h1>
-        <p className="text-neutral-400 text-sm">
-          Carga tu reporte CSV para procesar el análisis de inventario.
+        <p className="text-neutral-500 dark:text-neutral-400 text-sm">
+          Cargue su archivo CSV para procesar el análisis detallado del
+          inventario.
         </p>
 
         <div className="w-full flex flex-col gap-3 items-center mt-2">
