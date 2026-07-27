@@ -53,18 +53,9 @@ export const detectUnit = (
   const nameStr = (item.nombreArticulo || "").toLowerCase();
   const textToTest = `${categoryStr} ${nameStr}`.toLowerCase();
 
-  // 🎯 2. REGLA: CAFÉ (Fuerza siempre a 'un')
-
+  // 🎯 2. REGLA:/ COLD BREW / INFUSIONES (Fuerza siempre a 'ml')
   if (
-    hasWord(textToTest, "cafe") ||
-    hasWord(textToTest, "café") ||
-    hasWord(textToTest, "espresso")
-  ) {
-    return "un";
-  }
-
-  // 🎯 3. REGLA:/ COLD BREW / INFUSIONES (Fuerza siempre a 'ml')
-  if (
+    hasWord(textToTest, "borghetti") ||
     hasWord(textToTest, "martini") ||
     hasWord(textToTest, "cinzano rosso") ||
     hasWord(textToTest, "canela") ||
@@ -75,7 +66,7 @@ export const detectUnit = (
     return "ml";
   }
 
-  // 🎯 4. REGLA: LITROS / BARRIL / GRIFO (Kegs, Chopp, Cerveza Tirada, Vermut de Grifo, Proyectos)
+  // 🎯 3. REGLA: LITROS / BARRIL / GRIFO (Kegs, Chopp, Cerveza Tirada, Vermut de Grifo, Proyectos)
   if (
     hasWord(textToTest, "keg") ||
     hasWord(textToTest, "kegs") ||
@@ -89,12 +80,12 @@ export const detectUnit = (
     return "L";
   }
 
-  // 🎯 5. Override Global: Forzar a botellas todo lo demás que NO sea barril ni café
+  // 🎯 4. Override Global: Forzar a botellas todo lo demás que NO sea barril ni café
   if (forceAllBtl) {
     return "btl";
   }
 
-  // 🎯 6. REGLA PRINCIPAL DE BOTELLAS Y UNIDADES (PRIORIDAD ALTA)
+  // 🎯 5. REGLA PRINCIPAL DE BOTELLAS Y UNIDADES (PRIORIDAD ALTA)
   if (
     // AGUAS Y BEBIDAS SIN ALCOHOL
     hasWord(textToTest, "agua") ||
@@ -151,10 +142,19 @@ export const detectUnit = (
   ) {
     return "btl";
   }
+  // 🎯 6. REGLA: CAFÉ (Fuerza siempre a 'un')
+
+  if (
+    hasWord(textToTest, "cafe") ||
+    hasWord(textToTest, "café") ||
+    hasWord(textToTest, "espresso")
+  ) {
+    return "un";
+  }
 
   // 🎯 7. REGLA POR DEFECTO: Destilados / Licores / Coctelería a granel
   return "ml";
-};
+};;
 
 export const analyzeItem = (
   item: InventoryItem,
