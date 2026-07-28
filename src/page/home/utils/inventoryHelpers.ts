@@ -44,7 +44,7 @@ export const detectUnit = (
   categoryName?: string,
   forceAllBtl: boolean = false,
 ): UnitType => {
-  // 🎯 1. Prioridad Manual: Selección explícita del usuario en modo edición
+  // 🎯 1. Prioridad Manual
   if (item.manualUnit) {
     return item.manualUnit as UnitType;
   }
@@ -53,20 +53,12 @@ export const detectUnit = (
   const nameStr = (item.nombreArticulo || "").toLowerCase();
   const textToTest = `${categoryStr} ${nameStr}`.toLowerCase();
 
-  // 🎯 2. REGLA:/ COLD BREW / INFUSIONES (Fuerza siempre a 'ml')
-  if (
-    hasWord(textToTest, "borghetti") ||
-    hasWord(textToTest, "martini") ||
-    hasWord(textToTest, "cinzano rosso") ||
-    hasWord(textToTest, "canela") ||
-    hasWord(textToTest, "Lunfa") ||
-    hasWord(textToTest, "Veraniego") ||
-    textToTest.includes("cold brew")
-  ) {
-    return "ml";
+  // 🎯 2. EXCEPCIÓN BOTELLAS ESPECIALES: Cafe de Paris es Espumante ---> BTL
+  if (textToTest.includes("cafe de paris")) {
+    return "btl";
   }
 
-  // 🎯 3. REGLA: LITROS / BARRIL / GRIFO (Kegs, Chopp, Cerveza Tirada, Vermut de Grifo, Proyectos)
+  // 🎯 3. REGLA: LITROS / BARRIL / GRIFO / BAG-IN-BOX / SACHET (Prioridad Alta sobre ML y BTL)
   if (
     hasWord(textToTest, "keg") ||
     hasWord(textToTest, "kegs") ||
@@ -75,17 +67,53 @@ export const detectUnit = (
     hasWord(textToTest, "tirada") ||
     hasWord(textToTest, "draft") ||
     hasWord(textToTest, "grifo") ||
-    hasWord(textToTest, "proyecto")
+    hasWord(textToTest, "proyecto") ||
+    hasWord(textToTest, "bib") ||
+    hasWord(textToTest, "sachet") ||
+    textToTest.includes("10l") || 
+    textToTest.includes("10 l") || 
+    textToTest.includes("5l") ||
+    textToTest.includes("5 l")
   ) {
     return "L";
   }
 
-  // 🎯 4. Override Global: Forzar a botellas todo lo demás que NO sea barril ni café
+  // 🎯 4. EXCEPCIONES A 'ml': Licores de café, Coctelería y Vermuts de barra
+  if (
+    // Licores de Café (evitan caer en regla 'cafe' de unidad)
+    hasWord(textToTest, "borghetti") ||
+    hasWord(textToTest, "bols") ||
+    hasWord(textToTest, "cusenier") ||
+    textToTest.includes("tres plumas") ||
+    // Vermuts de barra y aperitivos a granel
+    hasWord(textToTest, "vermouth") ||
+    hasWord(textToTest, "vermut") ||
+    hasWord(textToTest, "vermu") ||
+    hasWord(textToTest, "cinzano") ||
+    hasWord(textToTest, "martini") ||
+    hasWord(textToTest, "canela") ||
+    hasWord(textToTest, "lunfa") ||
+    hasWord(textToTest, "veraniego") ||
+    textToTest.includes("cold brew")
+  ) {
+    return "ml";
+  }
+
+  // 🎯 5. REGLA: CAFÉ EN ENVASE / KILOS / PAQUETE (Fuerza a 'un')
+  if (
+    hasWord(textToTest, "cafe") ||
+    hasWord(textToTest, "café") ||
+    hasWord(textToTest, "espresso")
+  ) {
+    return "un";
+  }
+
+  // 🎯 6. Override Global
   if (forceAllBtl) {
     return "btl";
   }
 
-  // 🎯 5. REGLA PRINCIPAL DE BOTELLAS Y UNIDADES (PRIORIDAD ALTA)
+  // 🎯 7. REGLA BOTELLAS
   if (
     // AGUAS Y BEBIDAS SIN ALCOHOL
     hasWord(textToTest, "agua") ||
@@ -112,16 +140,13 @@ export const detectUnit = (
     hasWord(textToTest, "tónica") ||
     hasWord(textToTest, "tonica") ||
     textToTest.includes("paso de los toros") ||
-    // VINOS, VERMUTS, CERVEZAS Y ESPUMANTES
+    // VINOS, CERVEZAS Y ESPUMANTES
     hasWord(textToTest, "vino") ||
     hasWord(textToTest, "wine") ||
     hasWord(textToTest, "champagne") ||
     hasWord(textToTest, "espumante") ||
     hasWord(textToTest, "espumoso") ||
     hasWord(textToTest, "spritz") ||
-    hasWord(textToTest, "vermu") ||
-    hasWord(textToTest, "vermut") ||
-    hasWord(textToTest, "vermouth") ||
     hasWord(textToTest, "porron") ||
     hasWord(textToTest, "porrón") ||
     hasWord(textToTest, "cerveza") ||
@@ -142,17 +167,8 @@ export const detectUnit = (
   ) {
     return "btl";
   }
-  // 🎯 6. REGLA: CAFÉ (Fuerza siempre a 'un')
 
-  if (
-    hasWord(textToTest, "cafe") ||
-    hasWord(textToTest, "café") ||
-    hasWord(textToTest, "espresso")
-  ) {
-    return "un";
-  }
-
-  // 🎯 7. REGLA POR DEFECTO: Destilados / Licores / Coctelería a granel
+  // 🎯 8. DEFAULT: Destilados / Licores / Coctelería a granel
   return "ml";
 };;
 
