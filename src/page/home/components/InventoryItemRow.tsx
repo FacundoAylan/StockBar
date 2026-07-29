@@ -11,6 +11,9 @@ interface InventoryItemRowProps {
   forceAllBtl?: boolean;
   onDeleteItem: (groupIndex: number, itemIndex: number) => void;
   onToggleUnit: (groupIndex: number, itemIndex: number) => void;
+  renderPercentageBadge?: (
+    porcentaje?: string | number | null,
+  ) => React.ReactNode;
 }
 
 export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
@@ -22,6 +25,7 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
   forceAllBtl = false,
   onDeleteItem,
   onToggleUnit,
+  renderPercentageBadge,
 }) => {
   const {
     tieneDiferencia,
@@ -29,34 +33,27 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
     signo,
     diffAmount,
     unit,
-    prevNum,
-    actNum,
     ventasStr,
     usoStr,
   } = analyzeItem(item, categoryName, forceAllBtl);
 
   return (
-    <li className="py-3 flex flex-col sm:flex-row sm:items-center justify-between text-sm gap-2 px-2 rounded-lg avoid-break print:break-inside-avoid">
+    <li className="py-3 flex flex-col sm:flex-row sm:items-center justify-between text-sm gap-2 px-2 rounded-lg avoid-break print:break-inside-avoid hover:bg-neutral-100/50 transition-colors">
+      {/* 🎯 NOMBRE DEL ARTÍCULO + VENDIDO Y USADO */}
       <div className="flex flex-col">
         <span className="font-semibold text-neutral-800">
           {item.nombreArticulo}
         </span>
         <span className="text-xs text-neutral-500 mt-0.5">
-          Previa:{" "}
-          <strong className="text-neutral-700">
-            {prevNum} {unit}
-          </strong>{" "}
-          | Actual:{" "}
-          <strong className="text-neutral-700">
-            {actNum} {unit}
-          </strong>
+          Vendido: <strong className="text-neutral-700">{ventasStr}</strong> |
+          Usado: <strong className="text-neutral-700">{usoStr}</strong>
         </span>
       </div>
 
-      <div className="flex items-center gap-3 text-xs">
-        {/* 🎯 SOLO MOSTRAR SI REALMENTE HAY UNA DIFERENCIA DISTINTA DE 0 */}
+      <div className="flex items-center gap-2.5 text-xs flex-wrap">
+        {/* 🎯 FALTANTE / SOBRANTE + % DIFERENCIA AL LADO */}
         {tieneDiferencia && (
-          <>
+          <div className="flex items-center gap-1.5">
             <span
               className={`font-bold px-2.5 py-1 rounded-md border ${
                 esFaltante
@@ -67,35 +64,28 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
               {esFaltante ? "Faltan" : "Sobran"} {signo}
               {diffAmount} {unit}
             </span>
-            <span className="text-neutral-300">|</span>
-          </>
-        )}
 
-        <span className="text-neutral-500">
-          Ventas: <strong className="text-neutral-700">{ventasStr}</strong>
-        </span>
-        <span className="text-neutral-500">
-          Uso: <strong className="text-neutral-700">{usoStr}</strong>
-        </span>
+            {/* 🎯 % Diferencia ubicado al lado del Faltante/Sobrante */}
+            {renderPercentageBadge &&
+              renderPercentageBadge(item.porcentajeDiferencia)}
+          </div>
+        )}
 
         {/* 🎯 BOTONES DE MODO EDICIÓN */}
         {editMode && (
           <div className="flex items-center gap-1.5 ml-2 print:hidden">
-            {/* Botón para cambiar a la siguiente unidad (ml ➔ btl ➔ L ➔ ml) */}
             <button
               type="button"
               onClick={() => onToggleUnit(groupIndex, itemIdx)}
               className="text-amber-700 hover:text-amber-900 font-bold bg-amber-50 hover:bg-amber-100 p-1.5 rounded-lg transition-colors border border-amber-200 cursor-pointer text-xs flex items-center gap-1"
-              title={`Unidad actual: ${unit}. Clic para cambiar a la siguiente.`}
+              title={`Unidad actual: ${unit}. Clic para cambiar.`}
             >
-              {/* Muestra la Siguiente Unidad a aplicar */}
               {unit === "ml" && " Cambiar a Btl"}
               {unit === "btl" && " Cambiar a L"}
               {unit === "L" && " Cambiar a Unidad"}
               {unit === "un" && " Cambiar a ml"}
             </button>
 
-            {/* Botón Borrar */}
             <button
               type="button"
               onClick={() => onDeleteItem(groupIndex, itemIdx)}

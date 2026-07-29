@@ -22,7 +22,7 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
   editMode,
   forceAllBtl = false,
   onDeleteItem,
-  onToggleUnit, // 🎯 2. Desestructurado aquí
+  onToggleUnit,
 }) => {
   // 1. % DIFERENCIA
   const renderPercentageBadge = (porcentaje?: string | number | null) => {
@@ -121,7 +121,7 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
           </div>
         </div>
 
-        {/* 🎯 MÉTRICAS Y BADGES JUNTOS EN UN SOLO LUGAR */}
+        {/* 🎯 MÉTRICAS Y BADGES DE LA CATEGORÍA */}
         <div className="flex items-center gap-2 flex-wrap">
           {showCosts && renderCostImpactBadge(group.diferenciaCosto)}
           {renderVarianceBadge(group.diferencia)}
@@ -140,7 +140,8 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
             editMode={editMode}
             forceAllBtl={forceAllBtl}
             onDeleteItem={onDeleteItem}
-            onToggleUnit={onToggleUnit} 
+            onToggleUnit={onToggleUnit}
+            renderPercentageBadge={renderPercentageBadge}
           />
         ))}
       </ul>
