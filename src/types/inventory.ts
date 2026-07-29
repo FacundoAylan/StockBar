@@ -13,6 +13,8 @@ export interface InventoryItem {
   porcentajeCostoIdeal: string | null;
   unidad?: string | null;
   manualUnit?: string | null;
+  usoBtl?: string | number;
+  usoReal?: string | number;
 }
 
 export interface InventoryGroup {

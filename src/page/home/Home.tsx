@@ -1,5 +1,7 @@
+import { useRef, useState } from "react";
 import { useInventoryAnalysis } from "./hooks/useInventoryAnalysis";
 import { CategoryGroupCard } from "./components/CategoryGroupCard";
+import { ExecutiveDashboard } from "./components/ExecutiveDashboard";
 
 const Home = () => {
   const {
@@ -27,6 +29,15 @@ const Home = () => {
     toggleForceAllBtl,
   } = useInventoryAnalysis();
 
+  // 🎯 Estado para alternar entre Vista Detallada y Dashboard
+  const [activeTab, setActiveTab] = useState<"details" | "dashboard">(
+    "details",
+  );
+
+  // 🎯 Ref y estado para exportación de PDF
+  const reportRef = useRef<HTMLDivElement>(null);
+
+
   return (
     <main className="min-h-screen bg-neutral-950 text-white flex flex-col items-center justify-center p-4 print:bg-white print:p-0 print:block print:min-h-0">
       {/* Carga CSV (Tarjeta Inicial) */}
@@ -40,7 +51,6 @@ const Home = () => {
         </p>
 
         <div className="w-full flex flex-col gap-3 items-center mt-2">
-          {/* 🎯 Mostrar "Subir Archivo" o "Eliminar Archivo" dinámicamente */}
           {!fileName ? (
             <label
               htmlFor="file-upload"
@@ -72,7 +82,6 @@ const Home = () => {
             </span>
           )}
 
-          {/* 🎯 BOTÓN VER INFORME DETALLADO */}
           {jsonData && jsonData.length > 0 && (
             <button
               type="button"
@@ -91,85 +100,124 @@ const Home = () => {
           <div className="printable-modal relative w-full max-w-5xl max-h-[85vh] print:max-h-none print:max-w-none bg-white text-neutral-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden print:overflow-visible">
             {/* Header */}
             <div className="flex flex-wrap items-center justify-between p-6 border-b border-neutral-200 bg-neutral-50 gap-4">
-              <div>
+              <div className="flex flex-col gap-2">
                 <h2 className="text-2xl font-bold text-neutral-900">
                   Reporte de Inventario
                 </h2>
-                <p className="text-xs text-neutral-500 mt-0.5">
-                  Análisis unificado por unidad
-                </p>
+                {/* Selector de pestañas */}
+                <div className="flex items-center gap-1.5 bg-neutral-200/80 p-1 rounded-xl w-fit print:hidden">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("details")}
+                    className={`px-3 py-1.5 text-xs font-extrabold rounded-lg transition-all cursor-pointer ${
+                      activeTab === "details"
+                        ? "bg-white text-neutral-900 shadow-sm"
+                        : "text-neutral-600 hover:text-neutral-900"
+                    }`}
+                  >
+                    📋 Lista Detallada
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("dashboard")}
+                    className={`px-3 py-1.5 text-xs font-extrabold rounded-lg transition-all cursor-pointer ${
+                      activeTab === "dashboard"
+                        ? "bg-white text-neutral-900 shadow-sm"
+                        : "text-neutral-600 hover:text-neutral-900"
+                    }`}
+                  >
+                    📊 Dashboard Ejecutivo
+                  </button>
+                </div>
               </div>
 
+              {/* Botones de acción superiores (Condicionados según la pestaña activa) */}
               <div className="flex flex-wrap items-center gap-2 print:hidden">
-                {/* 🎯 BOTÓN PARA FORZAR TODO A BOTELLAS */}
-                <button
-                  type="button"
-                  onClick={toggleForceAllBtl}
-                  className={`px-3 py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 shadow-sm ${
-                    forceAllBtl
-                      ? "bg-amber-500 text-white border-amber-600 shadow-amber-500/20"
-                      : "bg-neutral-100 text-neutral-700 border-neutral-300 hover:bg-neutral-200"
-                  }`}
-                >
-                  🍾{" "}
-                  {forceAllBtl
-                    ? "Mostrar en unidades"
-                    : "Mostrar en botellas"}{" "}
-                </button>
+                {activeTab === "details" ? (
+                  /* 🎯 CONTROLES COMPLETOS (Lista Detallada) */
+                  <>
+                    <button
+                      type="button"
+                      onClick={toggleForceAllBtl}
+                      className={`px-3 py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 shadow-sm ${
+                        forceAllBtl
+                          ? "bg-amber-500 text-white border-amber-600 shadow-amber-500/20"
+                          : "bg-neutral-100 text-neutral-700 border-neutral-300 hover:bg-neutral-200"
+                      }`}
+                    >
+                      🍾{" "}
+                      {forceAllBtl
+                        ? "Mostrar en unidades"
+                        : "Mostrar en botellas"}{" "}
+                    </button>
 
-                {/* 🎯 OCULTAR EL SELECTOR DE ML CUANDO FORCEALLBTL ESTÁ ACTIVADO */}
-                {!forceAllBtl && (
-                  <select
-                    id="amount-filter"
-                    value={minAmountFilter}
-                    onChange={(e) => setMinAmountFilter(Number(e.target.value))}
-                    className="bg-white border border-neutral-300 hover:border-neutral-400 text-neutral-800 text-xs font-bold rounded-xl px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer transition-all"
-                  >
-                    <option value={0}>Filtrar Volumen: Todos</option>
-                    <option value={30}>Más de 30 ml</option>
-                    <option value={60}>Más de 60 ml</option>
-                  </select>
+                    {!forceAllBtl && (
+                      <select
+                        id="amount-filter"
+                        value={minAmountFilter}
+                        onChange={(e) =>
+                          setMinAmountFilter(Number(e.target.value))
+                        }
+                        className="bg-white border border-neutral-300 hover:border-neutral-400 text-neutral-800 text-xs font-bold rounded-xl px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer transition-all"
+                      >
+                        <option value={0}>Filtrar Volumen: Todos</option>
+                        <option value={30}>Más de 30 ml</option>
+                        <option value={60}>Más de 60 ml</option>
+                      </select>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => setEditMode(!editMode)}
+                      className={`px-3 py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
+                        editMode
+                          ? "bg-amber-500 text-white border-amber-600 shadow-sm"
+                          : "bg-neutral-100 text-neutral-700 border-neutral-300 hover:bg-neutral-200"
+                      }`}
+                    >
+                      {editMode ? "✓ Guardar Cambios" : "✏️ Editar Ítems"}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={toggleCosts}
+                      className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all border flex items-center gap-1.5 cursor-pointer shadow-sm ${
+                        showCosts
+                          ? "bg-amber-100 text-amber-900 border-amber-300 hover:bg-amber-200"
+                          : "bg-neutral-100 text-neutral-600 border-neutral-300 hover:bg-neutral-200"
+                      }`}
+                    >
+                      {showCosts ? "💰 Ocultar Costos" : "👁️ Mostrar Costos"}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowTextModal(true)}
+                      className="px-3.5 py-2 bg-neutral-800 hover:bg-neutral-900 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm"
+                    >
+                      ✉️ Copiar p/ Gmail
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => window.print()}
+                      className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm"
+                    >
+                      📄 PDF
+                    </button>
+                  </>
+                ) : (
+                  /* 🎯 SOLO DESCARGAR PDF / VER PDF EN DASHBOARD */
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => window.print()}
+                      className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm"
+                    >
+                      📄 PDF
+                    </button>
+                  </>
                 )}
-
-                <button
-                  type="button"
-                  onClick={() => setEditMode(!editMode)}
-                  className={`px-3 py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
-                    editMode
-                      ? "bg-amber-500 text-white border-amber-600 shadow-sm"
-                      : "bg-neutral-100 text-neutral-700 border-neutral-300 hover:bg-neutral-200"
-                  }`}
-                >
-                  {editMode ? "✓ Guardar Cambios" : "✏️ Editar Ítems"}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={toggleCosts}
-                  className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all border flex items-center gap-1.5 cursor-pointer shadow-sm ${
-                    showCosts
-                      ? "bg-amber-100 text-amber-900 border-amber-300 hover:bg-amber-200"
-                      : "bg-neutral-100 text-neutral-600 border-neutral-300 hover:bg-neutral-200"
-                  }`}
-                >
-                  {showCosts ? "💰 Ocultar Costos" : "👁️ Mostrar Costos"}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setShowTextModal(true)}
-                  className="px-3.5 py-2 bg-neutral-800 hover:bg-neutral-900 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm"
-                >
-                  ✉️ Copiar p/ Gmail
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => window.print()}
-                  className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm"
-                >
-                  📄 PDF
-                </button>
 
                 <button
                   type="button"
@@ -182,28 +230,38 @@ const Home = () => {
             </div>
 
             {/* Contenido Visual */}
-            <div className="p-6 overflow-y-auto print:overflow-visible print:max-h-none space-y-6">
-              {jsonData.map((group, groupIndex) => {
-                const itemsFiltrados = getFilteredItems(
-                  group.items,
-                  groupIndex,
-                );
-                if (itemsFiltrados.length === 0) return null;
+            <div
+              ref={reportRef}
+              className="p-6 overflow-y-auto print:overflow-visible print:max-h-none space-y-6 bg-white"
+            >
+              {activeTab === "details" ? (
+                jsonData.map((group, groupIndex) => {
+                  const itemsFiltrados = getFilteredItems(
+                    group.items,
+                    groupIndex,
+                  );
+                  if (itemsFiltrados.length === 0) return null;
 
-                return (
-                  <CategoryGroupCard
-                    key={groupIndex}
-                    group={group}
-                    groupIndex={groupIndex}
-                    filteredItems={itemsFiltrados}
-                    showCosts={showCosts}
-                    editMode={editMode}
-                    forceAllBtl={forceAllBtl}
-                    onDeleteItem={handleDeleteItem}
-                    onToggleUnit={handleToggleUnit}
-                  />
-                );
-              })}
+                  return (
+                    <CategoryGroupCard
+                      key={groupIndex}
+                      group={group}
+                      groupIndex={groupIndex}
+                      filteredItems={itemsFiltrados}
+                      showCosts={showCosts}
+                      editMode={editMode}
+                      forceAllBtl={forceAllBtl}
+                      onDeleteItem={handleDeleteItem}
+                      onToggleUnit={handleToggleUnit}
+                    />
+                  );
+                })
+              ) : (
+                <ExecutiveDashboard
+                  jsonData={jsonData}
+                  forceAllBtl={forceAllBtl}
+                />
+              )}
             </div>
 
             <div className="p-4 border-t border-neutral-200 bg-neutral-50 flex justify-end print:hidden">
