@@ -45,8 +45,8 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
           {item.nombreArticulo}
         </span>
         <span className="text-xs text-neutral-500 mt-0.5">
-          Vendido: <strong className="text-neutral-700">{ventasStr}</strong> |
-          Usado: <strong className="text-neutral-700">{usoStr}</strong>
+          Usado: <strong className="text-neutral-700">{usoStr}</strong> |
+          Vendido: <strong className="text-neutral-700">{ventasStr}</strong>
         </span>
       </div>
 

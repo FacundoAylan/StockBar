@@ -123,9 +123,9 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
 
         {/* 🎯 MÉTRICAS Y BADGES DE LA CATEGORÍA */}
         <div className="flex items-center gap-2 flex-wrap">
-          {showCosts && renderCostImpactBadge(group.diferenciaCosto)}
           {renderVarianceBadge(group.diferencia)}
           {renderPercentageBadge(group.porcentajeDiferencia)}
+          {showCosts && renderCostImpactBadge(group.diferenciaCosto)}
         </div>
       </div>
 

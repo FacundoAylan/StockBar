@@ -1,7 +1,6 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { useInventoryAnalysis } from "./hooks/useInventoryAnalysis";
 import { CategoryGroupCard } from "./components/CategoryGroupCard";
-import { ExecutiveDashboard } from "./components/ExecutiveDashboard";
 
 const Home = () => {
   const {
@@ -29,10 +28,6 @@ const Home = () => {
     toggleForceAllBtl,
   } = useInventoryAnalysis();
 
-  // 🎯 Estado para alternar entre Vista Detallada y Dashboard
-  const [activeTab, setActiveTab] = useState<"details" | "dashboard">(
-    "details",
-  );
 
   // 🎯 Ref y estado para exportación de PDF
   const reportRef = useRef<HTMLDivElement>(null);
@@ -104,38 +99,10 @@ const Home = () => {
                 <h2 className="text-2xl font-bold text-neutral-900">
                   Reporte de Inventario
                 </h2>
-                {/* Selector de pestañas */}
-                <div className="flex items-center gap-1.5 bg-neutral-200/80 p-1 rounded-xl w-fit print:hidden">
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("details")}
-                    className={`px-3 py-1.5 text-xs font-extrabold rounded-lg transition-all cursor-pointer ${
-                      activeTab === "details"
-                        ? "bg-white text-neutral-900 shadow-sm"
-                        : "text-neutral-600 hover:text-neutral-900"
-                    }`}
-                  >
-                    📋 Lista Detallada
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("dashboard")}
-                    className={`px-3 py-1.5 text-xs font-extrabold rounded-lg transition-all cursor-pointer ${
-                      activeTab === "dashboard"
-                        ? "bg-white text-neutral-900 shadow-sm"
-                        : "text-neutral-600 hover:text-neutral-900"
-                    }`}
-                  >
-                    📊 Dashboard Ejecutivo
-                  </button>
-                </div>
               </div>
 
               {/* Botones de acción superiores (Condicionados según la pestaña activa) */}
               <div className="flex flex-wrap items-center gap-2 print:hidden">
-                {activeTab === "details" ? (
-                  /* 🎯 CONTROLES COMPLETOS (Lista Detallada) */
-                  <>
                     <button
                       type="button"
                       onClick={toggleForceAllBtl}
@@ -205,19 +172,6 @@ const Home = () => {
                     >
                       📄 PDF
                     </button>
-                  </>
-                ) : (
-                  /* 🎯 SOLO DESCARGAR PDF / VER PDF EN DASHBOARD */
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => window.print()}
-                      className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm"
-                    >
-                      📄 PDF
-                    </button>
-                  </>
-                )}
 
                 <button
                   type="button"
@@ -234,7 +188,7 @@ const Home = () => {
               ref={reportRef}
               className="p-6 overflow-y-auto print:overflow-visible print:max-h-none space-y-6 bg-white"
             >
-              {activeTab === "details" ? (
+                {
                 jsonData.map((group, groupIndex) => {
                   const itemsFiltrados = getFilteredItems(
                     group.items,
@@ -256,12 +210,7 @@ const Home = () => {
                     />
                   );
                 })
-              ) : (
-                <ExecutiveDashboard
-                  jsonData={jsonData}
-                  forceAllBtl={forceAllBtl}
-                />
-              )}
+                }
             </div>
 
             <div className="p-4 border-t border-neutral-200 bg-neutral-50 flex justify-end print:hidden">
