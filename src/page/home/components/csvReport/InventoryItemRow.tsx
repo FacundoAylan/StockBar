@@ -1,6 +1,6 @@
 import React from "react";
-import { analyzeItem } from "../utils/inventoryHelpers";
-import type { InventoryItem } from "../../../types/inventory";
+import type { InventoryItem } from "../../../../types/inventory";
+import { analyzeItem } from "../../utils/inventoryHelpers";
 
 interface InventoryItemRowProps {
   item: InventoryItem;
@@ -14,6 +14,7 @@ interface InventoryItemRowProps {
   renderPercentageBadge?: (
     porcentaje?: string | number | null,
   ) => React.ReactNode;
+  isBar: boolean
 }
 
 export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
@@ -26,6 +27,7 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
   onDeleteItem,
   onToggleUnit,
   renderPercentageBadge,
+  isBar
 }) => {
   const {
     tieneDiferencia,
@@ -35,6 +37,8 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
     unit,
     ventasStr,
     usoStr,
+    prevNum,
+    actNum,
   } = analyzeItem(item, categoryName, forceAllBtl);
 
   return (
@@ -44,10 +48,17 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
         <span className="font-semibold text-neutral-800">
           {item.nombreArticulo}
         </span>
-        <span className="text-xs text-neutral-500 mt-0.5">
-          Usado: <strong className="text-neutral-700">{usoStr}</strong> |
-          Vendido: <strong className="text-neutral-700">{ventasStr}</strong>
-        </span>
+        {isBar ? (
+          <span className="text-xs text-neutral-500 mt-0.5">
+            Usado: <strong className="text-neutral-700">{usoStr}</strong> |
+            Vendido: <strong className="text-neutral-700">{ventasStr}</strong>
+          </span>
+        ) : (
+          <span className="text-xs text-neutral-500 mt-0.5">
+            Stock teorico: <strong className="text-neutral-700">{prevNum} btl</strong> |
+            conteo: <strong className="text-neutral-700">{actNum} btl</strong>
+          </span>
+        )}
       </div>
 
       <div className="flex items-center gap-2.5 text-xs flex-wrap">

@@ -1,6 +1,6 @@
 import React from "react";
 import { InventoryItemRow } from "./InventoryItemRow";
-import type { InventoryGroup } from "../../../types/inventory";
+import type { InventoryGroup } from "../../../../types/inventory";
 
 interface CategoryGroupCardProps {
   group: InventoryGroup;
@@ -12,6 +12,7 @@ interface CategoryGroupCardProps {
   forceAllBtl?: boolean;
   onDeleteItem: (groupIndex: number, itemIndex: number) => void;
   onToggleUnit: (groupIndex: number, itemIndex: number) => void;
+  isBar: boolean
 }
 
 export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
@@ -23,6 +24,7 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
   forceAllBtl = false,
   onDeleteItem,
   onToggleUnit,
+  isBar
 }) => {
   // 1. % DIFERENCIA
   const renderPercentageBadge = (porcentaje?: string | number | null) => {
@@ -142,6 +144,7 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
             onDeleteItem={onDeleteItem}
             onToggleUnit={onToggleUnit}
             renderPercentageBadge={renderPercentageBadge}
+            isBar={isBar}
           />
         ))}
       </ul>

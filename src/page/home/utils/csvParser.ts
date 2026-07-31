@@ -18,7 +18,7 @@ const mapRowToItem = (
   rowObj: Record<string, string | null>,
 ): InventoryItem => ({
   nombreArticulo: rowObj["nombre artículo"] || "",
-  existenciaPrevia: rowObj["existencia previa"] || null,
+  existenciaPrevia: rowObj["existencia previa"] || rowObj["compras"] || null,
   compras: rowObj["compras"] || null,
   existencia: rowObj["existencia"] || null,
   usado: rowObj["usado"] || null,
@@ -35,10 +35,16 @@ const mapRowToItem = (
 export const csvToJson = (csv: string): InventoryGroup[] => {
   if (!csv) return [];
 
-  const allLines = csv.split("\n");
+  // Normalizar saltos de línea para eliminar \r sobrantes
+  const cleanCsv = csv.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  const allLines = cleanCsv.split("\n");
   if (allLines.length < 2) return [];
 
-  const headers = parseCsvLine(allLines[0]).map((h) => h.toLowerCase());
+  // 1. Limpiar los headers de comillas, espacios y minúsculas
+  const headers = parseCsvLine(allLines[0]).map((h) =>
+    h.replace(/"/g, "").toLowerCase().trim(),
+  );
+
   const objList: InventoryGroup[] = [];
   let currentGroupItems: InventoryItem[] = [];
 
@@ -49,38 +55,41 @@ export const csvToJson = (csv: string): InventoryGroup[] => {
     const values = parseCsvLine(rawLine);
     const rowObj: Record<string, string | null> = {};
 
+    // 2. Mapear limpiando las comillas envolventes de los valores
     headers.forEach((header, index) => {
-      rowObj[header] = values[index] !== undefined ? values[index] : null;
+      const rawVal = values[index] !== undefined ? values[index] : null;
+      rowObj[header] = rawVal ? rawVal.replace(/^"|"$/g, "").trim() : null;
     });
 
     const itemNombre = rowObj["nombre artículo"] || "";
 
-    // Total row indicates the end of a category group
     if (itemNombre.includes("Total")) {
       const cleanCategory = itemNombre
         .replace(/^Total\s*/i, "")
         .replace(/:$/, "")
         .trim();
 
-    const categoryObject: InventoryGroup = {
-      categoria: cleanCategory,
-      icono: getCategoryIcon(cleanCategory),
-      existenciaPrevia: rowObj["existencia previa"] || "",
-      compras: rowObj["compras"] || "",
-      existencia: rowObj["existencia"] || "",
-      usado: rowObj["usado"] || "",
-      vendido: rowObj["vendido"] || "",
-      diferencia: rowObj["diferencia"] || "",
-      porcentajeDiferencia: rowObj["% diferencia"] || undefined,
-      diferenciaCosto: rowObj["diferencia (costo)"] || "",
-      ingresos: rowObj["ingresos"] || "",
-      porcentajeCosto: rowObj["porcentaje de costo"] || undefined,
-      porcentajeCostoIdeal: rowObj["porcentaje de costo ideal"] || undefined,
-      items: [...currentGroupItems],
-    };
+      const categoryObject: InventoryGroup = {
+        categoria: cleanCategory,
+        icono: getCategoryIcon(cleanCategory),
+        existenciaPrevia:
+          rowObj["existencia previa"] || rowObj["compras"] || "",
+        compras: rowObj["compras"] || "",
+        existencia: rowObj["existencia"] || "",
+        usado: rowObj["usado"] || "",
+        vendido: rowObj["vendido"] || "",
+        diferencia: rowObj["diferencia"] || "",
+        // ✅ Ahora rowObj["% diferencia"] siempre va a existir y coincidir perfectamente
+        porcentajeDiferencia: rowObj["% diferencia"] || undefined,
+        diferenciaCosto: rowObj["diferencia (costo)"] || "",
+        ingresos: rowObj["ingresos"] || "",
+        porcentajeCosto: rowObj["porcentaje de costo"] || undefined,
+        porcentajeCostoIdeal: rowObj["porcentaje de costo ideal"] || undefined,
+        items: [...currentGroupItems],
+      };
 
       objList.push(categoryObject);
-      currentGroupItems = []; // Reset item pool for next category
+      currentGroupItems = [];
     } else if (itemNombre) {
       currentGroupItems.push(mapRowToItem(rowObj));
     }
