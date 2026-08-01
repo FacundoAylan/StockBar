@@ -95,7 +95,7 @@ const generateGmailText = () => {
       if (isBar) {
         text += `      Vendido: ${analysis.ventasStr}  |  Usado: ${analysis.usoStr}\n`;
       } else {
-        text += `      Stock teórico: ${item.existenciaPrevia}  |  Stock: ${item.existencia}\n`;
+        text += `      Stock teórico: ${item.existenciaPrevia}  |  Conteo: ${item.existencia}\n`;
       }
 
       text += `      ${diffStr}${pctItemStr}\n\n`;
