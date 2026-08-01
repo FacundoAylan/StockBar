@@ -55,7 +55,8 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
           </span>
         ) : (
           <span className="text-xs text-neutral-500 mt-0.5">
-            Stock teorico: <strong className="text-neutral-700">{prevNum} btl</strong> |
+            Stock teórico:{" "}
+            <strong className="text-neutral-700">{prevNum} btl</strong> |
             conteo: <strong className="text-neutral-700">{actNum} btl</strong>
           </span>
         )}

@@ -108,7 +108,7 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
 
           <div className="flex items-center gap-3 text-xs text-neutral-600 mt-1 pl-8 font-medium">
             <span>
-              {isBar ? "Exist. Previa: " : "Stock Teórico: "}
+              {isBar ? "Exist. Previa: " : "Stock teórico: "}
               <strong className="text-neutral-900 bg-neutral-200 px-1.5 py-0.5 rounded">
                 {group.existenciaPrevia || "0"}
               </strong>
@@ -117,7 +117,7 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
             <span>•</span>
 
             <span>
-              {isBar ? "Exist. Actual: " : "Stock: "}
+              {isBar ? "Exist. Actual: " : "Conteo: "}
               <strong className="text-neutral-900 bg-neutral-200 px-1.5 py-0.5 rounded">
                 {group.existencia || "0"}
               </strong>
