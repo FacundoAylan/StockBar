@@ -10,10 +10,10 @@ export interface LossItem {
   costoEstimado: number; // Basado en el volumen de diferencia
 }
 
-export function calculateExecutiveMetrics(
+const calculateExecutiveMetrics = (
   jsonData: InventoryGroup[] | null,
   forceAllBtl: boolean,
-) {
+)=> {
   if (!jsonData || jsonData.length === 0) {
     return {
       lossLeaders: [],
@@ -109,4 +109,6 @@ export function calculateExecutiveMetrics(
     saludScore,
     grade,
   };
-}
+};
+
+export default calculateExecutiveMetrics

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { analyzeItem, parsePercentage } from "../utils/inventoryHelpers";
 import type { InventoryGroup} from "../../../types/inventory";
 
-export function useInventoryFilters(jsonData: InventoryGroup[] | null) {
+const useInventoryFilters = (jsonData: InventoryGroup[] | null) => {
   const [minPercentageFilter] = useState(0);
   const [minAmountFilter, setMinAmountFilter] = useState(0);
   const [showNegative, setShowNegative] = useState(false);
@@ -80,4 +80,6 @@ export function useInventoryFilters(jsonData: InventoryGroup[] | null) {
     resetIgnoredKeys,
     getFilteredItems,
   };
-}
+};
+
+export default useInventoryFilters;

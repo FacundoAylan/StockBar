@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useFileParser } from "./useFileParser";
-import { useInventoryFilters } from "./useInventoryFilters";
-import { useGmailReport } from "./useGmailReport";
+
 import { detectUnit, type UnitType } from "../utils/inventoryHelpers";
 import type { InventoryItem } from "../../../types/inventory";
+import useFileParser from "./useFileParser";
+import useInventoryFilters from "./useInventoryFilters";
+import useGmailReport from "./useGmailReport";
 
-export function useInventoryAnalysis(isBar:boolean) {
+const useInventoryAnalysis = (isBar:boolean)=> {
   const [showModal, setShowModal] = useState(false);
   const [showTextModal, setShowTextModal] = useState(false);
 
@@ -122,4 +123,6 @@ export function useInventoryAnalysis(isBar:boolean) {
     generateGmailText,
     copyToClipboard,
   };
-}
+};
+
+export default useInventoryAnalysis;

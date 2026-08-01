@@ -39,13 +39,13 @@ const toBoldText = (str: string) => {
   });
 };
 
-export function useGmailReport({
+const useGmailReport=({
   jsonData,
   showNegative,
   forceAllBtl,
   getFilteredItems,
   isBar
-}: UseGmailReportProps) {
+}: UseGmailReportProps) => {
   const [copied, setCopied] = useState(false);
 
 const generateGmailText = () => {
@@ -127,4 +127,6 @@ const generateGmailText = () => {
     generateGmailText,
     copyToClipboard,
   };
-}
+};
+
+export default useGmailReport;

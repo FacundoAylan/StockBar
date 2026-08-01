@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useInventoryAnalysis } from "./hooks/useInventoryAnalysis";
 import InputCard from "./components/inputCard/InputCard";
 import InventoryModal from "./components/csvReport/InventoryModal ";
+import useInventoryAnalysis from "./hooks/useInventoryAnalysis";
 
 const Home = () => {
   

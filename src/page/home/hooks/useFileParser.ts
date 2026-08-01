@@ -2,7 +2,7 @@ import { useState, type ChangeEvent } from "react";
 import { csvToJson } from "../utils/csvParser";
 import type { InventoryGroup } from "../../../types/inventory";
 
-export function useFileParser() {
+const useFileParser = () => {
   const [jsonData, setJsonData] = useState<InventoryGroup[] | null>(null);
   const [fileName, setFileName] = useState<string>("");
 
@@ -37,4 +37,6 @@ export function useFileParser() {
     handleFileChange,
     resetFile,
   };
-}
+};
+
+export default useFileParser;
