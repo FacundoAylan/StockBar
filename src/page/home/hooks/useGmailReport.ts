@@ -10,6 +10,7 @@ interface UseGmailReportProps {
     items: InventoryGroup["items"],
     groupIndex: number,
   ) => { item: InventoryGroup["items"][0]; itemIdx: number }[];
+  isBar: boolean
 }
 
 // 1. Convertidor a texto ANCHO MAYÚSCULA solo para Categorías
@@ -43,68 +44,72 @@ export function useGmailReport({
   showNegative,
   forceAllBtl,
   getFilteredItems,
+  isBar
 }: UseGmailReportProps) {
   const [copied, setCopied] = useState(false);
 
-  const generateGmailText = () => {
-    if (!jsonData) return "";
+const generateGmailText = () => {
+  if (!jsonData) return "";
 
-    const titulo = showNegative
-      ? "ANÁLISIS DE USADOS NEGATIVOS"
-      : "INFORME DE AUDITORÍA DE INVENTARIO";
+  const titulo = showNegative
+    ? "ANÁLISIS DE USADOS NEGATIVOS"
+    : "INFORME DE AUDITORÍA DE INVENTARIO";
 
-    let text = `====================================================\n`;
-    text += `📋 ${toWideUpperText(titulo)}\n`;
-    text += `====================================================\n\n`;
+  let text = `====================================================\n`;
+  text += `📋 ${toWideUpperText(titulo)}\n`;
+  text += `====================================================\n\n`;
 
-    jsonData.forEach((group, groupIdx) => {
-      const itemsFiltrados = getFilteredItems(group.items, groupIdx);
-      const categoryName = group?.categoria ?? "";
+  jsonData.forEach((group, groupIdx) => {
+    const itemsFiltrados = getFilteredItems(group.items, groupIdx);
+    const categoryName = group?.categoria ?? "";
 
-      if (itemsFiltrados.length > 0) {
-        // Métricas de Categoría
-        const diffCat = group.diferencia
-          ? `  (Faltan: ${group.diferencia})`
-          : "";
-        const pctCat = group.porcentajeDiferencia
-          ? ` (% dif: ${group.porcentajeDiferencia})`
-          : "";
-        const iconoGrupo = group.icono || "☕";
+    if (itemsFiltrados.length === 0) return;
 
-        // 🎯 CATEGORÍA: ÚNICA EN MAYÚSCULAS Y ANCHO
-        text += `${iconoGrupo}  ${toWideUpperText(group.categoria)}${diffCat}${pctCat}\n`;
-        text += `----------------------------------------------------\n`;
+    const diffCat = group.diferencia ? `  (Faltan: ${group.diferencia})` : "";
 
-        itemsFiltrados.forEach(({ item }) => {
-          const analysis = analyzeItem(item, categoryName, forceAllBtl);
+    const pctCat = group.porcentajeDiferencia
+      ? ` (% dif: ${group.porcentajeDiferencia})`
+      : "";
 
-          const pctItemStr = item.porcentajeDiferencia
-            ? ` -- % dif: ${item.porcentajeDiferencia}`
-            : "";
+    const iconoGrupo = group.icono || "☕";
 
-          let diffStr = "ok";
-          if (analysis.tieneDiferencia) {
-            const accion = analysis.esFaltante ? "Faltan" : "Sobran";
-            diffStr = `${accion}: ${analysis.signo}${analysis.diffAmount} ${analysis.unit.toLowerCase()}`;
-          }
+    text += `${iconoGrupo}  ${toWideUpperText(group.categoria)}${diffCat}${pctCat}\n`;
+    text += `----------------------------------------------------\n`;
 
-          // 🎯 ARTÍCULO Y MÉTRICAS: EN MINÚSCULAS CON NEGRITA
-          text += `   🔹 ${toBoldText(item.nombreArticulo)}\n`;
-          text += `      Vendido: ${analysis.ventasStr}  |  Usado: ${analysis.usoStr}\n`;
-          text += `      ${diffStr}${pctItemStr}\n\n`;
-        });
+    itemsFiltrados.forEach(({ item }) => {
+      const analysis = analyzeItem(item, categoryName, forceAllBtl);
 
-        text += `\n`;
+      const pctItemStr = item.porcentajeDiferencia
+        ? ` -- % dif: ${item.porcentajeDiferencia}`
+        : "";
+
+      let diffStr = "ok";
+
+      if (analysis.tieneDiferencia) {
+        const accion = analysis.esFaltante ? "Faltan" : "Sobran";
+        diffStr = `${accion}: ${analysis.signo}${analysis.diffAmount} ${analysis.unit.toLowerCase()}`;
       }
+
+      text += `   🔹 ${toBoldText(item.nombreArticulo)}\n`;
+
+      if (isBar) {
+        text += `      Vendido: ${analysis.ventasStr}  |  Usado: ${analysis.usoStr}\n`;
+      } else {
+        text += `      Stock teórico: ${item.existenciaPrevia}  |  Stock: ${item.existencia}\n`;
+      }
+
+      text += `      ${diffStr}${pctItemStr}\n\n`;
     });
 
-    text += `====================================================\n`;
-    text += `📌 Quedo a disposición ante cualquier consulta.\n`;
-    text += `Saludos cordiales.`;
+    text += `\n`;
+  });
 
-    return text;
-  };
+  text += `====================================================\n`;
+  text += `📌 Quedo a disposición ante cualquier consulta.\n`;
+  text += `Saludos cordiales.`;
 
+  return text;
+};
   const copyToClipboard = async () => {
     const textPlain = generateGmailText();
 

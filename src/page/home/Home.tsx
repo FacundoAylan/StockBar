@@ -4,6 +4,10 @@ import InputCard from "./components/inputCard/InputCard";
 import InventoryModal from "./components/csvReport/InventoryModal ";
 
 const Home = () => {
+  
+  //Para saber si es un bar o un bonprix
+  const[isBar, setIsBar] = useState(true);
+
   const {
     jsonData,
     showModal,
@@ -27,10 +31,8 @@ const Home = () => {
     toggleCosts,
     forceAllBtl,
     toggleForceAllBtl,
-  } = useInventoryAnalysis();
+  } = useInventoryAnalysis(isBar);
 
-  //Para saber si es un bar o un bonprix
-  const[isBar, setIsBar] = useState(true);
 
   return (
     <main className="min-h-screen bg-neutral-950 text-white flex flex-col items-center justify-center p-4 print:bg-white print:p-0 print:block print:min-h-0">

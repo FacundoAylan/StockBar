@@ -5,7 +5,7 @@ import { useGmailReport } from "./useGmailReport";
 import { detectUnit, type UnitType } from "../utils/inventoryHelpers";
 import type { InventoryItem } from "../../../types/inventory";
 
-export function useInventoryAnalysis() {
+export function useInventoryAnalysis(isBar:boolean) {
   const [showModal, setShowModal] = useState(false);
   const [showTextModal, setShowTextModal] = useState(false);
 
@@ -38,6 +38,7 @@ export function useInventoryAnalysis() {
     showNegative,
     forceAllBtl,
     getFilteredItems,
+    isBar
   });
 
   // Sobrescribir handleFileChange para limpiar elementos borrados al cargar uno nuevo
