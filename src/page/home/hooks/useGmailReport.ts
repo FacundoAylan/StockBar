@@ -39,77 +39,108 @@ const toBoldText = (str: string) => {
   });
 };
 
-const useGmailReport=({
+const useGmailReport = ({
   jsonData,
   showNegative,
   forceAllBtl,
   getFilteredItems,
-  isBar
+  isBar,
 }: UseGmailReportProps) => {
   const [copied, setCopied] = useState(false);
 
-const generateGmailText = () => {
-  if (!jsonData) return "";
+  const hasValue = (value: unknown): boolean => {
+    if (value == null || value === "") return false;
 
-  const titulo = showNegative
-    ? "ANÁLISIS DE USADOS NEGATIVOS"
-    : "INFORME DE AUDITORÍA DE INVENTARIO";
+    const str = String(value).trim();
 
-  let text = `====================================================\n`;
-  text += `📋 ${toWideUpperText(titulo)}\n`;
-  text += `====================================================\n\n`;
+    const normalized = str
+      .replace("%", "")
+      .replace(",", ".")
+      .replace(/[^\d.-]/g, "");
 
-  jsonData.forEach((group, groupIdx) => {
-    const itemsFiltrados = getFilteredItems(group.items, groupIdx);
-    const categoryName = group?.categoria ?? "";
+    const num = Number(normalized);
 
-    if (itemsFiltrados.length === 0) return;
+    if (!Number.isNaN(num)) {
+      return num !== 0;
+    }
 
-    const diffCat = group.diferencia ? `  (Faltan: ${group.diferencia})` : "";
+    return true;
+  };
 
-    const pctCat = group.porcentajeDiferencia
-      ? ` (% dif: ${group.porcentajeDiferencia})`
-      : "";
+  const generateGmailText = () => {
+    if (!jsonData) return "";
 
-    const iconoGrupo = group.icono || "☕";
+    const titulo = showNegative
+      ? "ANÁLISIS DE USADOS NEGATIVOS"
+      : "INFORME DE AUDITORÍA DE INVENTARIO";
 
-    text += `${iconoGrupo}  ${toWideUpperText(group.categoria)}${diffCat}${pctCat}\n`;
-    text += `----------------------------------------------------\n`;
+    let text = `====================================================\n`;
+    text += `📋 ${toWideUpperText(titulo)}\n`;
+    text += `====================================================\n\n`;
 
-    itemsFiltrados.forEach(({ item }) => {
-      const analysis = analyzeItem(item, categoryName, forceAllBtl);
+    jsonData.forEach((group, groupIdx) => {
+      const itemsFiltrados = getFilteredItems(group.items, groupIdx);
+      const categoryName = group?.categoria ?? "";
 
-      const pctItemStr = item.porcentajeDiferencia
-        ? ` -- % dif: ${item.porcentajeDiferencia}`
+      if (itemsFiltrados.length === 0) return;
+
+      const iconoGrupo = group.icono || "☕";
+
+      const diffCat = hasValue(group.diferencia)
+        ? `  (Faltan: ${group.diferencia})`
         : "";
 
-      let diffStr = "ok";
+      const pctCat = hasValue(group.porcentajeDiferencia)
+        ? ` (% dif: ${group.porcentajeDiferencia})`
+        : "";
 
-      if (analysis.tieneDiferencia) {
-        const accion = analysis.esFaltante ? "Faltan" : "Sobran";
-        diffStr = `${accion}: ${analysis.signo}${analysis.diffAmount} ${analysis.unit.toLowerCase()}`;
-      }
+      text += `${iconoGrupo}  ${toWideUpperText(
+        group.categoria ?? "",
+      )}${diffCat}${pctCat}\n`;
+      text += `----------------------------------------------------\n`;
 
-      text += `   🔹 ${toBoldText(item.nombreArticulo)}\n`;
+      itemsFiltrados.forEach(({ item }) => {
+        const analysis = analyzeItem(item, categoryName, forceAllBtl);
 
-      if (isBar) {
-        text += `      Vendido: ${analysis.ventasStr}  |  Usado: ${analysis.usoStr}\n`;
-      } else {
-        text += `      Stock teórico: ${item.existenciaPrevia}  |  Conteo: ${item.existencia}\n`;
-      }
+        const pctItemStr = hasValue(item.porcentajeDiferencia)
+          ? ` -- % dif: ${item.porcentajeDiferencia}`
+          : "";
 
-      text += `      ${diffStr}${pctItemStr}\n\n`;
+        let diffStr = "ok";
+
+        if (analysis.tieneDiferencia) {
+          const accion = analysis.esFaltante ? "Faltan" : "Sobran";
+          diffStr = `${accion}: ${analysis.signo}${analysis.diffAmount ?? 0} ${
+            analysis.unit?.toLowerCase() ?? ""
+          }`;
+        }
+
+        text += `   🔹 ${toBoldText(item.nombreArticulo ?? "")}\n`;
+
+        if (isBar) {
+          text += `      Vendido: ${analysis.ventasStr ?? 0}  |  Usado: ${
+            analysis.usoStr ?? 0
+          }\n`;
+        } else {
+          const conteo =
+            Number(item.existencia ?? 0) === 0 ? "Sin stock" : item.existencia;
+
+          text += `      Stock teórico: ${item.existenciaPrevia ?? 0}  |  Conteo: ${conteo}\n`;
+        }
+
+        text += `      ${diffStr}${pctItemStr}\n\n`;
+      });
+
+      text += "\n";
     });
 
-    text += `\n`;
-  });
+    text += `====================================================\n`;
+    text += `📌 Quedo a disposición ante cualquier consulta.\n`;
+    text += `Saludos cordiales.`;
 
-  text += `====================================================\n`;
-  text += `📌 Quedo a disposición ante cualquier consulta.\n`;
-  text += `Saludos cordiales.`;
+    return text;
+  };
 
-  return text;
-};
   const copyToClipboard = async () => {
     const textPlain = generateGmailText();
 
