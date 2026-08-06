@@ -84,8 +84,10 @@ export const detectUnit = (
     hasWord(textToTest, "borghetti") ||
     hasWord(textToTest, "bols") ||
     hasWord(textToTest, "cusenier") ||
-    textToTest.includes("tres plumas") ||
+    hasWord(textToTest, "tia") ||
+    textToTest.includes("tia maria") ||
     // Vermuts de barra y aperitivos a granel
+    textToTest.includes("tres plumas") ||
     hasWord(textToTest, "vermouth") ||
     hasWord(textToTest, "vermut") ||
     hasWord(textToTest, "vermu") ||
@@ -94,6 +96,8 @@ export const detectUnit = (
     hasWord(textToTest, "canela") ||
     hasWord(textToTest, "lunfa") ||
     hasWord(textToTest, "veraniego") ||
+    hasWord(textToTest, "gancia") ||
+    textToTest.includes("gancia spritz") ||
     textToTest.includes("cold brew")
   ) {
     return "ml";
@@ -170,7 +174,7 @@ export const detectUnit = (
 
   // 🎯 8. DEFAULT: Destilados / Licores / Coctelería a granel
   return "ml";
-};;
+};
 
 export const analyzeItem = (
   item: InventoryItem,
