@@ -1,19 +1,21 @@
 import { useState } from "react";
+
 import { analyzeItem } from "../utils/inventoryHelpers";
 import type { InventoryGroup } from "../../../types/inventory";
 
+import useInventoryStore from "../../../zustand/store/inventoryStore";
+
 interface UseGmailReportProps {
-  jsonData: InventoryGroup[] | null;
-  showNegative: boolean;
-  forceAllBtl: boolean;
   getFilteredItems: (
     items: InventoryGroup["items"],
     groupIndex: number,
-  ) => { item: InventoryGroup["items"][0]; itemIdx: number }[];
-  isBar: boolean
+  ) => {
+    item: InventoryGroup["items"][0];
+    itemIdx: number;
+  }[];
 }
 
-// 1. Convertidor a texto ANCHO MAYÚSCULA solo para Categorías
+// Convertidor a texto ancho en MAYÚSCULAS
 const toWideUpperText = (str: string) => {
   return str
     .toUpperCase()
@@ -22,34 +24,40 @@ const toWideUpperText = (str: string) => {
     );
 };
 
-// 2. Convertidor a NEGRITA REAL UNICODE (mantiene mayúsculas y minúsculas)
+// Convertidor a NEGRITA Unicode
 const toBoldText = (str: string) => {
   return str.replace(/[A-Za-z0-9]/g, (ch) => {
     const code = ch.charCodeAt(0);
-    // Mayúsculas A-Z
-    if (code >= 65 && code <= 90)
+
+    // Mayúsculas
+    if (code >= 65 && code <= 90) {
       return String.fromCodePoint(0x1d5a0 + (code - 65));
-    // Minúsculas a-z
-    if (code >= 97 && code <= 122)
+    }
+
+    // Minúsculas
+    if (code >= 97 && code <= 122) {
       return String.fromCodePoint(0x1d5ba + (code - 97));
-    // Números 0-9
-    if (code >= 48 && code <= 57)
+    }
+
+    // Números
+    if (code >= 48 && code <= 57) {
       return String.fromCodePoint(0x1d7e2 + (code - 48));
+    }
+
     return ch;
   });
 };
 
-const useGmailReport = ({
-  jsonData,
-  showNegative,
-  forceAllBtl,
-  getFilteredItems,
-  isBar,
-}: UseGmailReportProps) => {
+const useGmailReport = ({ getFilteredItems }: UseGmailReportProps) => {
   const [copied, setCopied] = useState(false);
 
+  // Zustand
+  const { jsonData, isBar, forceAllBtl } = useInventoryStore();
+
   const hasValue = (value: unknown): boolean => {
-    if (value == null || value === "") return false;
+    if (value == null || value === "") {
+      return false;
+    }
 
     const str = String(value).trim();
 
@@ -68,21 +76,26 @@ const useGmailReport = ({
   };
 
   const generateGmailText = () => {
-    if (!jsonData) return "";
+    if (!jsonData) {
+      return "";
+    }
 
-    const titulo = showNegative
-      ? "ANÁLISIS DE USADOS NEGATIVOS"
-      : "INFORME DE AUDITORÍA DE INVENTARIO";
+    const titulo = "INFORME DE AUDITORÍA DE INVENTARIO";
 
     let text = `====================================================\n`;
+
     text += `📋 ${toWideUpperText(titulo)}\n`;
+
     text += `====================================================\n\n`;
 
     jsonData.forEach((group, groupIdx) => {
       const itemsFiltrados = getFilteredItems(group.items, groupIdx);
+
       const categoryName = group?.categoria ?? "";
 
-      if (itemsFiltrados.length === 0) return;
+      if (itemsFiltrados.length === 0) {
+        return;
+      }
 
       const iconoGrupo = group.icono || "☕";
 
@@ -95,8 +108,9 @@ const useGmailReport = ({
         : "";
 
       text += `${iconoGrupo}  ${toWideUpperText(
-        group.categoria ?? "",
+        categoryName,
       )}${diffCat}${pctCat}\n`;
+
       text += `----------------------------------------------------\n`;
 
       itemsFiltrados.forEach(({ item }) => {
@@ -110,6 +124,7 @@ const useGmailReport = ({
 
         if (analysis.tieneDiferencia) {
           const accion = analysis.esFaltante ? "Faltan" : "Sobran";
+
           diffStr = `${accion}: ${analysis.signo}${analysis.diffAmount ?? 0} ${
             analysis.unit?.toLowerCase() ?? ""
           }`;
@@ -125,7 +140,9 @@ const useGmailReport = ({
           const conteo =
             Number(item.existencia ?? 0) === 0 ? "Sin stock" : item.existencia;
 
-          text += `      Stock teórico: ${item.existenciaPrevia ?? 0}  |  Conteo: ${conteo}\n`;
+          text += `      Stock teórico: ${
+            item.existenciaPrevia ?? 0
+          }  |  Conteo: ${conteo}\n`;
         }
 
         text += `      ${diffStr}${pctItemStr}\n\n`;
@@ -135,7 +152,9 @@ const useGmailReport = ({
     });
 
     text += `====================================================\n`;
+
     text += `📌 Quedo a disposición ante cualquier consulta.\n`;
+
     text += `Saludos cordiales.`;
 
     return text;
@@ -146,8 +165,12 @@ const useGmailReport = ({
 
     try {
       await navigator.clipboard.writeText(textPlain);
+
       setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
+
+      setTimeout(() => {
+        setCopied(false);
+      }, 2500);
     } catch (err) {
       console.error("Error al copiar texto plano:", err);
     }

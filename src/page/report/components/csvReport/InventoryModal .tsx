@@ -1,73 +1,55 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import { CategoryGroupCard } from "./CategoryGroupCard";
-import type { InventoryGroup, InventoryItem } from "../../../../types/inventory";
+import { useNavigate } from "react-router-dom";
 
-interface FilteredItem {
-  item: InventoryItem;
-  itemIdx: number;
-}
+import { CategoryGroupCard } from "./CategoryGroupCard";
+import useInventoryStore from "../../../../zustand/store/inventoryStore";
+import useInventoryAnalysis from "../../hooks/useInventoryAnalysis";
 
 interface InventoryModalProps {
-  jsonData: InventoryGroup[];
-
-  setShowModal: Dispatch<SetStateAction<boolean>>;
   setShowTextModal: Dispatch<SetStateAction<boolean>>;
-
-  minAmountFilter: number;
-  setMinAmountFilter: Dispatch<SetStateAction<number>>;
-
-  editMode: boolean;
-  setEditMode: Dispatch<SetStateAction<boolean>>;
-
-  handleDeleteItem: (groupIndex: number, itemIndex: number) => void;
-  handleToggleUnit: (groupIndex: number, itemIndex: number) => void;
-
-  getFilteredItems: (
-    items: InventoryItem[],
-    groupIndex: number,
-  ) => FilteredItem[];
-
-  showCosts: boolean;
-  toggleCosts: () => void;
-
-  forceAllBtl: boolean;
-  toggleForceAllBtl: () => void;
-
-  isBar: boolean;
 }
 
-const InventoryModal = ({
-  jsonData,
-  setShowModal,
-  setShowTextModal,
-  minAmountFilter,
-  setMinAmountFilter,
-  editMode,
-  setEditMode,
-  handleDeleteItem,
-  handleToggleUnit,
-  getFilteredItems,
-  showCosts,
-  toggleCosts,
-  forceAllBtl,
-  toggleForceAllBtl,
-  isBar,
-}: InventoryModalProps) => {
+const InventoryModal = ({ setShowTextModal }: InventoryModalProps) => {
   const reportRef = useRef<HTMLDivElement>(null);
 
+  const [editMode, setEditMode] = useState(false);
+  const [showCosts, setShowCosts] = useState(true);
+
+  const navigate = useNavigate();
+
+  // Estado global
+  const { jsonData, forceAllBtl, isBar } = useInventoryStore();
+
+  // Lógica del reporte
+  const {
+    minAmountFilter,
+    setMinAmountFilter,
+    handleDeleteItem,
+    handleToggleUnit,
+    getFilteredItems,
+    toggleForceAllBtl,
+  } = useInventoryAnalysis();
+
+  const toggleCosts = () => {
+    setShowCosts((prev) => !prev);
+  };
+
+  if (!jsonData) {
+    return null;
+  }
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 print:static print:p-0 print:block">
-      <div className="printable-modal relative w-full max-w-5xl max-h-[85vh] print:max-h-none print:max-w-none bg-white text-neutral-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden print:overflow-visible">
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 print:static print:inset-auto print:block print:bg-transparent print:p-0">
+      <div className="w-full max-w-5xl max-h-[85vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col print:max-w-none print:max-h-none print:rounded-none print:shadow-none print:overflow-visible print:block">
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between p-6 border-b border-neutral-200 bg-neutral-50 gap-4">
-          <div className="flex flex-col gap-2">
-            <h2 className="text-2xl font-bold text-neutral-900">
-              Reporte de Inventario
-            </h2>
-          </div>
+        <div className="p-4 border-b border-neutral-200 bg-white flex justify-between items-center">
+          <h2 className="text-xl font-bold text-neutral-800">
+            Reporte de Inventario
+          </h2>
 
           <div className="flex flex-wrap items-center gap-2 print:hidden">
+            {/* Forzar botellas */}
             <button
               type="button"
               onClick={toggleForceAllBtl}
@@ -80,6 +62,7 @@ const InventoryModal = ({
               🍾 {forceAllBtl ? "Mostrar en unidades" : "Mostrar en botellas"}
             </button>
 
+            {/* Filtro de volumen */}
             {!forceAllBtl && (
               <select
                 id="amount-filter"
@@ -95,9 +78,10 @@ const InventoryModal = ({
               </select>
             )}
 
+            {/* Modo edición */}
             <button
               type="button"
-              onClick={() => setEditMode(!editMode)}
+              onClick={() => setEditMode((prev) => !prev)}
               className={`px-3 py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
                 editMode
                   ? "bg-amber-500 text-white border-amber-600 shadow-sm"
@@ -107,6 +91,7 @@ const InventoryModal = ({
               {editMode ? "✓ Guardar Cambios" : "✏️ Editar Ítems"}
             </button>
 
+            {/* Costos */}
             <button
               type="button"
               onClick={toggleCosts}
@@ -119,6 +104,7 @@ const InventoryModal = ({
               {showCosts ? "💰 Ocultar Costos" : "👁️ Mostrar Costos"}
             </button>
 
+            {/* Gmail */}
             <button
               type="button"
               onClick={() => setShowTextModal(true)}
@@ -127,6 +113,7 @@ const InventoryModal = ({
               ✉️ Copiar p/ Gmail
             </button>
 
+            {/* PDF */}
             <button
               type="button"
               onClick={() => window.print()}
@@ -135,9 +122,10 @@ const InventoryModal = ({
               📄 PDF
             </button>
 
+            {/* Cerrar */}
             <button
               type="button"
-              onClick={() => setShowModal(false)}
+              onClick={() => navigate("/")}
               className="w-8 h-8 flex items-center justify-center rounded-full bg-neutral-200 hover:bg-neutral-300 text-neutral-700 font-bold cursor-pointer transition-colors"
             >
               ✕
@@ -153,7 +141,9 @@ const InventoryModal = ({
           {jsonData.map((group, groupIndex) => {
             const itemsFiltrados = getFilteredItems(group.items, groupIndex);
 
-            if (itemsFiltrados.length === 0) return null;
+            if (itemsFiltrados.length === 0) {
+              return null;
+            }
 
             return (
               <CategoryGroupCard
@@ -172,10 +162,11 @@ const InventoryModal = ({
           })}
         </div>
 
+        {/* Footer */}
         <div className="p-4 border-t border-neutral-200 bg-neutral-50 flex justify-end print:hidden">
           <button
             type="button"
-            onClick={() => setShowModal(false)}
+            onClick={() => navigate("/")}
             className="px-5 py-2 bg-neutral-800 hover:bg-neutral-900 text-white text-sm font-semibold rounded-lg cursor-pointer"
           >
             Cerrar

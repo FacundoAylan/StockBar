@@ -29,10 +29,10 @@
   }
 
   /* 🎯 EVITAR CORTES EN BLOQUES COMPLETO (Categorías, filas, tarjetas) */
-  .avoid-break {
+  /* .avoid-break {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
-  }
+  } */
 
   /* 🎯 FORZAR SALTO DE PÁGINA (por si quieres separar secciones) */
   .force-page-break {

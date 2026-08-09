@@ -53,26 +53,78 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
   };
 
   // 2. VARIACIÓN / DIFERENCIA (Acepta undefined)
-  const renderVarianceBadge = (diferencia?: string | null) => {
-    if (!diferencia || diferencia === "0") return null;
-    const cleanDiff = diferencia.trim();
-    const esNegativo = cleanDiff.includes("-");
+const renderVarianceBadge = (
+  diferencia?: string | null,
+  categoria?: string,
+  forceAllBtl = false,
+) => {
+  if (!diferencia || diferencia.trim() === "0") return null;
 
-    return (
-      <span
-        className={`text-xs font-bold px-3 py-1 rounded-full border ${
-          esNegativo
-            ? "bg-rose-100 text-rose-800 border-rose-200"
-            : "bg-emerald-100 text-emerald-800 border-emerald-200"
-        }`}
-      >
-        Variación{" "}
-        {cleanDiff.startsWith("+") || cleanDiff.startsWith("-")
-          ? cleanDiff
-          : `+${cleanDiff}`}
-      </span>
-    );
-  };
+  const cleanDiff = diferencia.trim();
+  const esNegativo = cleanDiff.includes("-");
+
+  const category = categoria?.toLowerCase().trim() ?? "";
+
+  const bottleCategories = [
+    "porron",
+    "porrón",
+    "espumantes",
+    "wine",
+    "vino",
+    "energizantes",
+    "energéticas",
+    "aguas",
+    "agua",
+    "gaseosas",
+    "gaseosa",
+  ];
+
+  let formattedDiff = cleanDiff;
+
+  if (forceAllBtl) {
+    formattedDiff = formattedDiff
+      .replace(/\bml\b/gi, "btls")
+      .replace(/\bL\b/gi, "btls");
+
+    // Si ya viene sin unidad, agregar btls
+    if (!/\b(ml|L|btls?)\b/i.test(formattedDiff)) {
+      formattedDiff += " btls";
+    }
+  } else if (category.includes("keg")) {
+    formattedDiff = formattedDiff
+      .replace(/\bml\b/gi, "L")
+      .replace(/\bmls\b/gi, "L");
+
+    if (!/\b(L)\b/i.test(formattedDiff)) {
+      formattedDiff += " L";
+    }
+  } else if (bottleCategories.some((name) => category.includes(name))) {
+    formattedDiff = formattedDiff
+      .replace(/\bml\b/gi, "btls")
+      .replace(/\bL\b/gi, "btls");
+
+    // Porrón / espumantes pueden venir sin unidad
+    if (!/\b(btls?)\b/i.test(formattedDiff)) {
+      formattedDiff += " btls";
+    }
+  }
+
+  if (!formattedDiff.startsWith("+") && !formattedDiff.startsWith("-")) {
+    formattedDiff = `+${formattedDiff}`;
+  }
+
+  return (
+    <span
+      className={`text-xs font-bold px-3 py-1 rounded-full border ${
+        esNegativo
+          ? "bg-rose-100 text-rose-800 border-rose-200"
+          : "bg-emerald-100 text-emerald-800 border-emerald-200"
+      }`}
+    >
+      Variación {formattedDiff}
+    </span>
+  );
+};
 
   // 3. IMPACTO DE COSTO (Acepta undefined)
   const renderCostImpactBadge = (diferenciaCosto?: string | null) => {
@@ -96,7 +148,7 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
   };
 
   return (
-    <div className="border border-neutral-200 rounded-xl p-5 bg-neutral-50/50 hover:bg-neutral-50 transition-colors shadow-sm avoid-break print:break-inside-avoid">
+    <div className="border border-neutral-200 rounded-xl p-5 bg-neutral-50/50 hover:bg-neutral-50 transition-colors shadow-sm print:break-inside-auto mb-6">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-200 pb-3 mb-4">
         <div>
           <div className="flex items-center gap-2">

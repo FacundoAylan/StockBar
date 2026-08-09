@@ -1,25 +1,20 @@
 import type { ChangeEvent } from "react";
-import type { InventoryGroup } from "../../../../types/inventory";
+import { useNavigate } from "react-router-dom";
+import useInventoryStore from "../../../zustand/store/inventoryStore";
 
 interface InputCardProps {
-  jsonData: InventoryGroup[] | null;
-  fileName: string;
   handleFileChange: (e: ChangeEvent<HTMLInputElement>) => void;
-  handleRemoveFile: () => void;
-  setIsBar: React.Dispatch<React.SetStateAction<boolean>>;
-  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
-  setForceAllBtl: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const InputCard = ({
-  jsonData,
-  fileName,
   handleFileChange,
-  handleRemoveFile,
-  setIsBar,
-  setShowModal,
-  setForceAllBtl,
 }: InputCardProps) => {
+
+  const navigate = useNavigate();
+
+  const { jsonData, fileName, setIsBar, setForceAllBtl } = useInventoryStore();
+  const resetFile = useInventoryStore((state) => state.resetFile);
+
   const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     const barSelected = value === "Bar";
@@ -27,6 +22,19 @@ export const InputCard = ({
     setIsBar(barSelected);
     setForceAllBtl(!barSelected);
   };
+
+  const handleRemoveFile = () => {
+    resetFile();
+
+    const fileInput = document.getElementById(
+      "file-upload",
+    ) as HTMLInputElement;
+
+    if (fileInput) {
+      fileInput.value = "";
+    }
+  };
+
 
   return (
     <div className="w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-6 text-center print:hidden">
@@ -79,7 +87,7 @@ export const InputCard = ({
 
             <button
               type="button"
-              onClick={() => setShowModal(true)}
+              onClick={() => navigate("/report")}
               className="w-full py-3 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition-all shadow-lg cursor-pointer"
             >
               Ver Informe Detallado
