@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { InventoryItemRow } from "./InventoryItemRow";
 import type { InventoryGroup } from "../../../../types/inventory";
 
@@ -12,8 +12,10 @@ interface CategoryGroupCardProps {
   forceAllBtl?: boolean;
   onDeleteItem: (groupIndex: number, itemIndex: number) => void;
   onToggleUnit: (groupIndex: number, itemIndex: number) => void;
-  isBar: boolean
+  isBar: boolean;
 }
+
+type UnitType = "btls" | "un" | "ml" | "L" | null;
 
 export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
   group,
@@ -24,8 +26,58 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
   forceAllBtl = false,
   onDeleteItem,
   onToggleUnit,
-  isBar
+  isBar,
 }) => {
+  // Estado local para alternar la visibilidad/tipo de unidad
+  const [activeUnit, setActiveUnit] = useState<UnitType>(null);
+
+  // Determinar la unidad por defecto según la categoría del grupo
+  const getDefaultUnit = (catName?: string): UnitType => {
+    const category = (catName ?? "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
+
+    const unitCategories = [
+      "cafe",
+      "cafes",
+      "coffee",
+      "cafeteria",
+      "infusion",
+      "infusiones",
+      "desayuno",
+      "desayunos",
+      "caliente",
+      "calientes",
+    ];
+
+    const mlCategories = ["vermouth", "vermut"];
+
+    if (unitCategories.some((name) => category.includes(name))) return "un";
+    if (mlCategories.some((name) => category.includes(name))) return "ml";
+    if (category.includes("keg")) return "L";
+    return "btls";
+  };
+
+  // Ciclo para alternar las unidades al presionar la variación
+  const toggleUnitOnClick = () => {
+    if (!activeUnit) {
+      setActiveUnit(getDefaultUnit(group.categoria));
+    } else {
+      const units: UnitType[] = ["btls", "un", "ml", "L", null];
+      const nextIndex = (units.indexOf(activeUnit) + 1) % units.length;
+      setActiveUnit(units[nextIndex]);
+    }
+  };
+
+  // Helper para extraer solo el número limpiando texto previo
+  const getOnlyNumber = (text?: string | null) => {
+    if (!text) return "0";
+    const match = text.trim().match(/-?\d+([.,]\d+)?/);
+    return match ? match[0] : text.trim();
+  };
+
   // 1. % DIFERENCIA
   const renderPercentageBadge = (porcentaje?: string | number | null) => {
     if (porcentaje === undefined || porcentaje === null || porcentaje === "")
@@ -52,81 +104,37 @@ export const CategoryGroupCard: React.FC<CategoryGroupCardProps> = ({
     );
   };
 
-  // 2. VARIACIÓN / DIFERENCIA (Acepta undefined)
-const renderVarianceBadge = (
-  diferencia?: string | null,
-  categoria?: string,
-  forceAllBtl = false,
-) => {
-  if (!diferencia || diferencia.trim() === "0") return null;
+  // 2. VARIACIÓN / DIFERENCIA
+  const renderVarianceBadge = (diferencia?: string | null) => {
+    if (!diferencia || diferencia.trim() === "0") return null;
 
-  const cleanDiff = diferencia.trim();
-  const esNegativo = cleanDiff.includes("-");
+    const numValue = getOnlyNumber(diferencia);
+    const esNegativo = numValue.includes("-");
 
-  const category = categoria?.toLowerCase().trim() ?? "";
+    // Formatear valor: con o sin unidad dependiendo de `activeUnit`
+    let formattedDiff = activeUnit ? `${numValue} ${activeUnit}` : numValue;
 
-  const bottleCategories = [
-    "porron",
-    "porrón",
-    "espumantes",
-    "wine",
-    "vino",
-    "energizantes",
-    "energéticas",
-    "aguas",
-    "agua",
-    "gaseosas",
-    "gaseosa",
-  ];
-
-  let formattedDiff = cleanDiff;
-
-  if (forceAllBtl) {
-    formattedDiff = formattedDiff
-      .replace(/\bml\b/gi, "btls")
-      .replace(/\bL\b/gi, "btls");
-
-    // Si ya viene sin unidad, agregar btls
-    if (!/\b(ml|L|btls?)\b/i.test(formattedDiff)) {
-      formattedDiff += " btls";
+    // Agregar signo +
+    if (!formattedDiff.startsWith("+") && !formattedDiff.startsWith("-")) {
+      formattedDiff = `+${formattedDiff}`;
     }
-  } else if (category.includes("keg")) {
-    formattedDiff = formattedDiff
-      .replace(/\bml\b/gi, "L")
-      .replace(/\bmls\b/gi, "L");
 
-    if (!/\b(L)\b/i.test(formattedDiff)) {
-      formattedDiff += " L";
-    }
-  } else if (bottleCategories.some((name) => category.includes(name))) {
-    formattedDiff = formattedDiff
-      .replace(/\bml\b/gi, "btls")
-      .replace(/\bL\b/gi, "btls");
+    return (
+      <button
+        type="button"
+        onClick={toggleUnitOnClick}
+        className={`text-xs font-bold px-3 py-1 rounded-full border transition-all transform active:scale-95 cursor-pointer ${
+          esNegativo
+            ? "bg-rose-100 text-rose-800 border-rose-200 hover:bg-rose-200"
+            : "bg-emerald-100 text-emerald-800 border-emerald-200 hover:bg-emerald-200"
+        }`}
+      >
+        Variación {formattedDiff}
+      </button>
+    );
+  };
 
-    // Porrón / espumantes pueden venir sin unidad
-    if (!/\b(btls?)\b/i.test(formattedDiff)) {
-      formattedDiff += " btls";
-    }
-  }
-
-  if (!formattedDiff.startsWith("+") && !formattedDiff.startsWith("-")) {
-    formattedDiff = `+${formattedDiff}`;
-  }
-
-  return (
-    <span
-      className={`text-xs font-bold px-3 py-1 rounded-full border ${
-        esNegativo
-          ? "bg-rose-100 text-rose-800 border-rose-200"
-          : "bg-emerald-100 text-emerald-800 border-emerald-200"
-      }`}
-    >
-      Variación {formattedDiff}
-    </span>
-  );
-};
-
-  // 3. IMPACTO DE COSTO (Acepta undefined)
+  // 3. IMPACTO DE COSTO
   const renderCostImpactBadge = (diferenciaCosto?: string | null) => {
     if (!diferenciaCosto) return null;
     const isNeg = diferenciaCosto.includes("-");
@@ -147,6 +155,12 @@ const renderVarianceBadge = (
     );
   };
 
+  // Formatear existencia para agregarle la unidad activa
+  const formatExistencia = (val?: string | null) => {
+    const rawNum = getOnlyNumber(val);
+    return activeUnit ? `${rawNum} ${activeUnit}` : rawNum;
+  };
+
   return (
     <div className="border border-neutral-200 rounded-xl p-5 bg-neutral-50/50 hover:bg-neutral-50 transition-colors shadow-sm print:break-inside-auto mb-6">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-200 pb-3 mb-4">
@@ -161,8 +175,8 @@ const renderVarianceBadge = (
           <div className="flex items-center gap-3 text-xs text-neutral-600 mt-1 pl-8 font-medium">
             <span>
               {isBar ? "Exist. Previa: " : "Stock teórico: "}
-              <strong className="text-neutral-900 bg-neutral-200 px-1.5 py-0.5 rounded">
-                {group.existenciaPrevia || "0"}
+              <strong className="text-neutral-900 bg-neutral-200 px-1.5 py-0.5 rounded transition-all">
+                {formatExistencia(group.existenciaPrevia)}
               </strong>
             </span>
 
@@ -170,8 +184,8 @@ const renderVarianceBadge = (
 
             <span>
               {isBar ? "Exist. Actual: " : "Conteo: "}
-              <strong className="text-neutral-900 bg-neutral-200 px-1.5 py-0.5 rounded">
-                {group.existencia || "0"}
+              <strong className="text-neutral-900 bg-neutral-200 px-1.5 py-0.5 rounded transition-all">
+                {formatExistencia(group.existencia)}
               </strong>
             </span>
           </div>

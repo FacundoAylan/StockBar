@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -19,7 +19,7 @@ const InventoryModal = ({ setShowTextModal }: InventoryModalProps) => {
   const navigate = useNavigate();
 
   // Estado global
-  const { jsonData, forceAllBtl, isBar } = useInventoryStore();
+  const { jsonData, forceAllBtl,setForceAllBtl , isBar } = useInventoryStore();
 
   // Lógica del reporte
   const {
@@ -35,19 +35,38 @@ const InventoryModal = ({ setShowTextModal }: InventoryModalProps) => {
     setShowCosts((prev) => !prev);
   };
 
+  const handleClose = ()=>{
+    setForceAllBtl(false);
+    navigate("/");
+  }
+
+  useEffect(() => {
+    if (!jsonData) {
+      setForceAllBtl(false);
+      navigate("/", { replace: true });
+    }
+  }, [jsonData, navigate, setForceAllBtl]);
+
   if (!jsonData) {
     return null;
   }
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 print:static print:inset-auto print:block print:bg-transparent print:p-0">
-      <div className="w-full max-w-5xl max-h-[85vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col print:max-w-none print:max-h-none print:rounded-none print:shadow-none print:overflow-visible print:block">
+      <div className="relative w-full max-w-5xl max-h-[85vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col print:max-w-none print:max-h-none print:rounded-none print:shadow-none print:overflow-visible print:block">
+        <h2 className="text-center mt-4 text-xl font-bold text-neutral-800">
+          Reporte de Inventario
+        </h2>
+        {/* Cerrar */}
+        <button
+          type="button"
+          onClick={handleClose}
+          className="absolute right-2 top-2 w-8 h-8 flex items-center justify-center rounded-full bg-neutral-200 hover:bg-neutral-300 text-neutral-700 font-bold cursor-pointer transition-colors"
+        >
+          ✕
+        </button>
         {/* Header */}
-        <div className="p-4 border-b border-neutral-200 bg-white flex justify-between items-center">
-          <h2 className="text-xl font-bold text-neutral-800">
-            Reporte de Inventario
-          </h2>
-
+        <div className="p-4 border-b border-neutral-200 bg-white flex justify-center items-center">
           <div className="flex flex-wrap items-center gap-2 print:hidden">
             {/* Forzar botellas */}
             <button
@@ -121,15 +140,6 @@ const InventoryModal = ({ setShowTextModal }: InventoryModalProps) => {
             >
               📄 PDF
             </button>
-
-            {/* Cerrar */}
-            <button
-              type="button"
-              onClick={() => navigate("/")}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-neutral-200 hover:bg-neutral-300 text-neutral-700 font-bold cursor-pointer transition-colors"
-            >
-              ✕
-            </button>
           </div>
         </div>
 
@@ -162,16 +172,6 @@ const InventoryModal = ({ setShowTextModal }: InventoryModalProps) => {
           })}
         </div>
 
-        {/* Footer */}
-        <div className="p-4 border-t border-neutral-200 bg-neutral-50 flex justify-end print:hidden">
-          <button
-            type="button"
-            onClick={() => navigate("/")}
-            className="px-5 py-2 bg-neutral-800 hover:bg-neutral-900 text-white text-sm font-semibold rounded-lg cursor-pointer"
-          >
-            Cerrar
-          </button>
-        </div>
       </div>
     </div>
   );
