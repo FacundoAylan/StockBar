@@ -7,7 +7,7 @@ const Home = () => {
 
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-white flex flex-col items-center justify-center p-4">
+    <main className="w-full h-full text-white flex flex-col items-center justify-center p-4">
       <InputCard
         handleFileChange={handleFileChange}
       />

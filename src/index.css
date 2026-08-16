@@ -2,41 +2,51 @@
 
 @media print {
   @page {
-    margin: 0;
+    margin: 1.5cm;
   }
 
+  /* 1. Resetear visibilidad de overflow en TODOS los ancestros */
+  html,
   body,
   main,
-  .printable-modal {
-    display: block !important;
-    justify-content: flex-start !important;
-    align-items: flex-start !important;
-    margin: 0 !important;
-    padding: 0 !important;
+  div,
+  section {
+    overflow: visible !important;
     height: auto !important;
+    max-height: none !important;
     min-height: 0 !important;
   }
 
   body {
-    padding: 1.5cm !important;
+    background: white !important;
+    color: black !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
+  /* 2. Forzar que contenedores flex/grid no bloqueen el flujo de páginas */
+  main,
   .printable-modal {
-    position: relative !important;
-    max-height: none !important;
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
     box-shadow: none !important;
     border: none !important;
   }
 
-  /* 🎯 EVITAR CORTES EN BLOQUES COMPLETO (Categorías, filas, tarjetas) */
-  /* .avoid-break {
+  /* 3. Evitar que las tarjetas de categorías o tablas se rompan por la mitad */
+  .printable-modal>div,
+  article,
+  table,
+  tr {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
-  } */
+  }
 
-  /* 🎯 FORZAR SALTO DE PÁGINA (por si quieres separar secciones) */
-  .force-page-break {
-    break-before: page !important;
-    page-break-before: always !important;
+  /* 4. Ocultar la barra de scroll al imprimir */
+  ::-webkit-scrollbar {
+    display: none !important;
   }
 }

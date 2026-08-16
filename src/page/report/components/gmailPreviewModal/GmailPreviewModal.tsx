@@ -1,19 +1,23 @@
 import type { Dispatch, SetStateAction } from "react";
 
 import useGmailReport from "../../hooks/useGmailReport";
-import useInventoryFilters from "../../hooks/useInventoryFilters";
-import useInventoryStore from "../../../../zustand/store/inventoryStore";
+import type { InventoryGroup} from "../../../../types/inventory";
+import type { FilteredInventoryItem } from "../../../../types/inventoryModal";
+
 
 interface GmailPreviewModalProps {
+  getFilteredItems: (
+    items: InventoryGroup["items"],
+    groupIndex: number,
+  ) => FilteredInventoryItem[];
+
   setShowTextModal: Dispatch<SetStateAction<boolean>>;
 }
 
-const GmailPreviewModal = ({ setShowTextModal }: GmailPreviewModalProps) => {
-
- const { jsonData } = useInventoryStore();
-
- const { getFilteredItems } = useInventoryFilters(jsonData);
-
+const GmailPreviewModal = ({
+  getFilteredItems,
+  setShowTextModal,
+}: GmailPreviewModalProps) => {
   const { generateGmailText, copyToClipboard, copied } = useGmailReport({
     getFilteredItems,
   });

@@ -1,16 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import type { Dispatch, SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { CategoryGroupCard } from "./CategoryGroupCard";
 import useInventoryStore from "../../../../zustand/store/inventoryStore";
-import useInventoryAnalysis from "../../hooks/useInventoryAnalysis";
+import type { InventoryModalProps } from "../../../../types/inventoryModal";
 
-interface InventoryModalProps {
-  setShowTextModal: Dispatch<SetStateAction<boolean>>;
-}
-
-const InventoryModal = ({ setShowTextModal }: InventoryModalProps) => {
+const InventoryModal = ({
+  minAmountFilter,
+  setMinAmountFilter,
+  handleDeleteItem,
+  handleToggleUnit,
+  getFilteredItems,
+  setShowTextModal,
+}: InventoryModalProps) => {
   const reportRef = useRef<HTMLDivElement>(null);
 
   const [editMode, setEditMode] = useState(false);
@@ -19,26 +20,28 @@ const InventoryModal = ({ setShowTextModal }: InventoryModalProps) => {
   const navigate = useNavigate();
 
   // Estado global
-  const { jsonData, forceAllBtl,setForceAllBtl , isBar } = useInventoryStore();
-
-  // Lógica del reporte
-  const {
-    minAmountFilter,
-    setMinAmountFilter,
-    handleDeleteItem,
-    handleToggleUnit,
-    getFilteredItems,
-    toggleForceAllBtl,
-  } = useInventoryAnalysis();
+  const { jsonData, forceAllBtl, setForceAllBtl, isBar, fileName } = useInventoryStore();
 
   const toggleCosts = () => {
     setShowCosts((prev) => !prev);
   };
 
-  const handleClose = ()=>{
+  const handleClose = () => {
     setForceAllBtl(false);
     navigate("/");
-  }
+  };
+
+  const handlePrint = () => {
+    const originalTitle = document.title;
+
+    const barName = fileName ? fileName.split("-")[0].trim() : "Bar";
+
+    document.title = barName;
+
+    window.print();
+
+    document.title = originalTitle;
+  };
 
   useEffect(() => {
     if (!jsonData) {
@@ -52,101 +55,101 @@ const InventoryModal = ({ setShowTextModal }: InventoryModalProps) => {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 print:static print:inset-auto print:block print:bg-transparent print:p-0">
-      <div className="relative w-full max-w-5xl max-h-[85vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col print:max-w-none print:max-h-none print:rounded-none print:shadow-none print:overflow-visible print:block">
-        <h2 className="text-center mt-4 text-xl font-bold text-neutral-800">
-          Reporte de Inventario
-        </h2>
-        {/* Cerrar */}
-        <button
-          type="button"
-          onClick={handleClose}
-          className="absolute right-2 top-2 w-8 h-8 flex items-center justify-center rounded-full bg-neutral-200 hover:bg-neutral-300 text-neutral-700 font-bold cursor-pointer transition-colors"
-        >
-          ✕
-        </button>
-        {/* Header */}
-        <div className="p-4 border-b border-neutral-200 bg-white flex justify-center items-center">
-          <div className="flex flex-wrap items-center gap-2 print:hidden">
-            {/* Forzar botellas */}
-            <button
-              type="button"
-              onClick={toggleForceAllBtl}
-              className={`px-3 py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 shadow-sm ${
-                forceAllBtl
-                  ? "bg-amber-500 text-white border-amber-600 shadow-amber-500/20"
-                  : "bg-neutral-100 text-neutral-700 border-neutral-300 hover:bg-neutral-200"
-              }`}
-            >
-              🍾 {forceAllBtl ? "Mostrar en unidades" : "Mostrar en botellas"}
-            </button>
+    <div className="w-full max-h-[470px] flex flex-col items-center justify-center p-2 print:block print:w-full print:h-auto print:max-h-none print:p-0">
+      <div className="relative w-full max-w-5xl max-h-[85vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-slate-500 print:block print:w-full print:h-auto print:max-w-none print:max-h-none print:rounded-none print:shadow-none print:border-none print:overflow-visible">
+        {/* Header y Acciones */}
+        <div className="relative border-b border-sky-400/20 bg-[#060818]/95 px-4 py-2.5 backdrop-blur-md print:hidden">
+          <div className="flex flex-col items-center justify-between gap-2 pr-8 md:flex-row">
+            {/* Título */}
+            <h2 className="text-base font-black uppercase tracking-wider text-slate-300">
+              Reporte de Inventario
+            </h2>
 
-            {/* Filtro de volumen */}
-            {!forceAllBtl && (
-              <select
-                id="amount-filter"
-                value={minAmountFilter}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                  setMinAmountFilter(Number(e.target.value))
-                }
-                className="bg-white border border-neutral-300 hover:border-neutral-400 text-neutral-800 text-xs font-bold rounded-xl px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer transition-all"
+            {/* Barra de acciones y filtros */}
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {/* Filtro de Volumen */}
+              {!forceAllBtl && (
+                <select
+                  id="amount-filter"
+                  value={minAmountFilter}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                    setMinAmountFilter(Number(e.target.value))
+                  }
+                  className="cursor-pointer rounded-lg border border-sky-400/25 bg-slate-900 px-2.5 py-1.5 text-xs font-bold text-sky-200 transition-all focus:border-sky-400/50 focus:outline-none focus:ring-1 focus:ring-sky-400/20"
+                >
+                  <option value={0} className="bg-[#060818] text-slate-100">
+                    Filtrar: Todos
+                  </option>
+                  <option value={30} className="bg-[#060818] text-slate-100">
+                    &gt; 30 ml
+                  </option>
+                  <option value={60} className="bg-[#060818] text-slate-100">
+                    &gt; 60 ml
+                  </option>
+                </select>
+              )}
+
+              {/* Modo Edición */}
+              <button
+                type="button"
+                onClick={() => setEditMode((prev) => !prev)}
+                className={`flex cursor-pointer items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-bold transition-all active:scale-95 ${
+                  editMode
+                    ? "border-sky-300 bg-sky-400 text-[#060818] shadow-[0_0_12px_rgba(56,189,248,0.2)]"
+                    : "border-sky-400/25 bg-slate-900 text-sky-300 hover:border-sky-400/50 hover:bg-sky-500/10"
+                }`}
               >
-                <option value={0}>Filtrar Volumen: Todos</option>
-                <option value={30}>Más de 30 ml</option>
-                <option value={60}>Más de 60 ml</option>
-              </select>
-            )}
+                {editMode ? "✓ Guardar" : "✏️ Editar"}
+              </button>
 
-            {/* Modo edición */}
-            <button
-              type="button"
-              onClick={() => setEditMode((prev) => !prev)}
-              className={`px-3 py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
-                editMode
-                  ? "bg-amber-500 text-white border-amber-600 shadow-sm"
-                  : "bg-neutral-100 text-neutral-700 border-neutral-300 hover:bg-neutral-200"
-              }`}
-            >
-              {editMode ? "✓ Guardar Cambios" : "✏️ Editar Ítems"}
-            </button>
+              {/* Costos */}
+              <button
+                type="button"
+                onClick={toggleCosts}
+                className={`flex cursor-pointer items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-bold transition-all active:scale-95 ${
+                  showCosts
+                    ? "border-sky-400/40 bg-sky-500/10 text-sky-300"
+                    : "border-slate-700 bg-slate-900 text-slate-400 hover:border-slate-600 hover:text-slate-300"
+                }`}
+              >
+                {showCosts ? "💰 Costos" : "👁️ Costos"}
+              </button>
 
-            {/* Costos */}
-            <button
-              type="button"
-              onClick={toggleCosts}
-              className={`px-3.5 py-2 text-xs font-bold rounded-xl transition-all border flex items-center gap-1.5 cursor-pointer shadow-sm ${
-                showCosts
-                  ? "bg-amber-100 text-amber-900 border-amber-300 hover:bg-amber-200"
-                  : "bg-neutral-100 text-neutral-600 border-neutral-300 hover:bg-neutral-200"
-              }`}
-            >
-              {showCosts ? "💰 Ocultar Costos" : "👁️ Mostrar Costos"}
-            </button>
+              {/* Gmail */}
+              <button
+                type="button"
+                onClick={() => setShowTextModal(true)}
+                className="flex cursor-pointer items-center gap-1 rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs font-bold text-slate-300 transition-all hover:border-sky-400/30 hover:bg-sky-500/5 hover:text-sky-200 active:scale-95"
+              >
+                ✉️ Gmail
+              </button>
 
-            {/* Gmail */}
-            <button
-              type="button"
-              onClick={() => setShowTextModal(true)}
-              className="px-3.5 py-2 bg-neutral-800 hover:bg-neutral-900 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm"
-            >
-              ✉️ Copiar p/ Gmail
-            </button>
-
-            {/* PDF */}
-            <button
-              type="button"
-              onClick={() => window.print()}
-              className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm"
-            >
-              📄 PDF
-            </button>
+              {/* PDF */}
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="flex cursor-pointer items-center gap-1 rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs font-bold text-slate-300 transition-all hover:border-slate-500 hover:bg-slate-800 hover:text-slate-100 active:scale-95"
+              >
+                📄 PDF
+              </button>
+            </div>
           </div>
+
+          {/* Botón cerrar */}
+          <button
+            type="button"
+            onClick={handleClose}
+            className="absolute right-2 top-2.5 flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg border border-red-500/40 bg-red-600 text-xs font-bold text-white transition-all hover:border-red-400 hover:bg-red-500 hover:shadow-[0_0_12px_rgba(239,68,68,0.25)] active:scale-95"
+            aria-label="Cerrar modal"
+          >
+            ✕
+          </button>
         </div>
 
-        {/* Contenido */}
+        {/* Contenido Imprimible y Escroleable */}
         <div
           ref={reportRef}
-          className="p-6 overflow-y-auto print:overflow-visible print:max-h-none space-y-6 bg-white"
+          className="flex-1 p-6 overflow-y-auto space-y-6 bg-white print:block print:w-full print:h-auto print:max-h-none print:overflow-visible print:p-0"
         >
           {jsonData.map((group, groupIndex) => {
             const itemsFiltrados = getFilteredItems(group.items, groupIndex);
@@ -171,7 +174,6 @@ const InventoryModal = ({ setShowTextModal }: InventoryModalProps) => {
             );
           })}
         </div>
-
       </div>
     </div>
   );
