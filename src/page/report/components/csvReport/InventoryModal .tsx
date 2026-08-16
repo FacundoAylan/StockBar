@@ -112,7 +112,7 @@ const InventoryModal = ({
                     : "border-slate-700 bg-slate-900 text-slate-400 hover:border-slate-600 hover:text-slate-300"
                 }`}
               >
-                {showCosts ? "💰 Costos" : "👁️ Costos"}
+                {showCosts ? "👁️ Costos" : "🚫 Costos"}
               </button>
 
               {/* Gmail */}
