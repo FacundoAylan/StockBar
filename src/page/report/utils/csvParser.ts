@@ -1,4 +1,4 @@
-import type { InventoryGroup, InventoryItem } from "../../../types/inventory";
+import type { InventoryGroup, InventoryItem } from "@/types/inventory";
 import { getCategoryIcon } from "./categoryHelper";
 
 export const parseCsvLine = (line: string): string[] => {

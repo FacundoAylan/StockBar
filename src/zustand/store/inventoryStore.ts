@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { InventoryGroup } from "../../types/inventory";
+import type { InventoryGroup } from "@/types/inventory";
 
 interface InventoryState {
   jsonData: InventoryGroup[] | null;

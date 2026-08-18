@@ -1,6 +1,6 @@
 const NavBar = () => {
   return (
-    <nav className="w-full flex items-center justify-between px-6 py-2 bg-slate-950 border-b-2 border-slate-500/80 text-slate-100 shadow-2xl print:hidden z-20">
+    <nav className="w-full flex items-center justify-between px-6 py-2 bg-slate-950 border-b-2 border-slate-500/80 text-slate-100 shadow-2xl z-20">
       <div className="flex items-center gap-1 select-none">
         <div className="flex flex-col">
           <h1 className="flex items-center gap-2 text-2xl font-black tracking-widest uppercase">

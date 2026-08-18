@@ -2,7 +2,7 @@ import {
   CATEGORY_ICON_MAP,
   DEFAULT_CATEGORY_ICON,
   FALLBACK_ICON,
-} from "../../../constants/categoryIcons";
+} from "@/constants/categoryIcons";
 
 
 export const getCategoryIcon = (categoryName: string): string => {

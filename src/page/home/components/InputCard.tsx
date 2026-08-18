@@ -1,6 +1,6 @@
 import type { ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import useInventoryStore from "../../../zustand/store/inventoryStore";
+import useInventoryStore from "@/zustand/store/inventoryStore";
 
 interface InputCardProps {
   handleFileChange: (e: ChangeEvent<HTMLInputElement>) => void;
@@ -40,7 +40,7 @@ export const InputCard = ({
       {/* Glow celeste */}
       <div className="pointer-events-none absolute left-1/2 top-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-500/10 blur-[110px]" />
 
-      <div className="relative z-10 flex w-full max-w-lg flex-col items-center gap-6 overflow-hidden rounded-2xl border border-white/10 border-t-white/20 border-l-white/20 bg-slate-900/50 p-8 text-center shadow-[0_10px_40px_rgba(0,0,0,0.7)] backdrop-blur-xl print:hidden">
+      <div className="relative z-10 flex w-full max-w-lg flex-col items-center gap-6 overflow-hidden rounded-2xl border border-white/10 border-t-white/20 border-l-white/20 bg-slate-900/50 p-8 text-center shadow-[0_10px_40px_rgba(0,0,0,0.7)] backdrop-blur-xl">
         {/* Reflejo superior */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/[0.05] to-transparent" />
 

@@ -1,8 +1,8 @@
 import type { Dispatch, SetStateAction } from "react";
 
 import useGmailReport from "../../hooks/useGmailReport";
-import type { InventoryGroup} from "../../../../types/inventory";
-import type { FilteredInventoryItem } from "../../../../types/inventoryModal";
+import type { InventoryGroup} from "@/types/inventory";
+import type { FilteredInventoryItem } from "@/types/inventoryModal";
 
 
 interface GmailPreviewModalProps {

@@ -1,9 +1,9 @@
 import { useState } from "react";
 
 import { analyzeItem } from "../utils/inventoryHelpers";
-import type { InventoryGroup } from "../../../types/inventory";
+import type { InventoryGroup } from "@/types/inventory";
 
-import useInventoryStore from "../../../zustand/store/inventoryStore";
+import useInventoryStore from "@/zustand/store/inventoryStore";
 
 interface UseGmailReportProps {
   getFilteredItems: (

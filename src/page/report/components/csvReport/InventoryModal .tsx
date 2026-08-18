@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CategoryGroupCard } from "./CategoryGroupCard";
-import useInventoryStore from "../../../../zustand/store/inventoryStore";
-import type { InventoryModalProps } from "../../../../types/inventoryModal";
+import useInventoryStore from "@/zustand/store/inventoryStore";
+import type { InventoryModalProps } from "@/types/inventoryModal";
+import { useReactToPrint } from "react-to-print";
 
 const InventoryModal = ({
   minAmountFilter,
@@ -31,17 +32,10 @@ const InventoryModal = ({
     navigate("/");
   };
 
-  const handlePrint = () => {
-    const originalTitle = document.title;
-
-    const barName = fileName ? fileName.split("-")[0].trim() : "Bar";
-
-    document.title = barName;
-
-    window.print();
-
-    document.title = originalTitle;
-  };
+  const handlePrint = useReactToPrint({
+    contentRef: reportRef,
+    documentTitle: fileName ? fileName.split("-")[0].trim() : "Bar",
+  });
 
   useEffect(() => {
     if (!jsonData) {
@@ -55,10 +49,10 @@ const InventoryModal = ({
   }
 
   return (
-    <div className="w-full max-h-[470px] flex flex-col items-center justify-center p-2 print:block print:w-full print:h-auto print:max-h-none print:p-0">
-      <div className="relative w-full max-w-5xl max-h-[85vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-slate-500 print:block print:w-full print:h-auto print:max-w-none print:max-h-none print:rounded-none print:shadow-none print:border-none print:overflow-visible">
+    <div className="w-full max-h-[470px] flex flex-col items-center justify-center p-2">
+      <div className="relative w-full max-w-5xl max-h-[85vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-slate-500">
         {/* Header y Acciones */}
-        <div className="relative border-b border-sky-400/20 bg-[#060818]/95 px-4 py-2.5 backdrop-blur-md print:hidden">
+        <div className="relative border-b border-sky-400/20 bg-[#060818]/95 px-4 py-2.5 backdrop-blur-md">
           <div className="flex flex-col items-center justify-between gap-2 pr-8 md:flex-row">
             {/* Título */}
             <h2 className="text-base font-black uppercase tracking-wider text-slate-300">
@@ -149,7 +143,8 @@ const InventoryModal = ({
         {/* Contenido Imprimible y Escroleable */}
         <div
           ref={reportRef}
-          className="flex-1 p-6 overflow-y-auto space-y-6 bg-white print:block print:w-full print:h-auto print:max-h-none print:overflow-visible print:p-0"
+          id="report"
+          className="flex-1 space-y-3 overflow-y-auto bg-white p-6"
         >
           {jsonData.map((group, groupIndex) => {
             const itemsFiltrados = getFilteredItems(group.items, groupIndex);

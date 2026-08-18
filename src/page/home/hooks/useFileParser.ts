@@ -1,6 +1,6 @@
 import type { ChangeEvent } from "react";
-import { csvToJson } from "../../report/utils/csvParser";
-import useInventoryStore from "../../../zustand/store/inventoryStore";
+import useInventoryStore from "@/zustand/store/inventoryStore";
+import { csvToJson } from "@/page/report/utils/csvParser";
 
 const useFileParser = () => {
   const setJsonData = useInventoryStore((state) => state.setJsonData);

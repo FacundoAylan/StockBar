@@ -17,7 +17,7 @@ const ViewReport = () => {
   } = useInventoryAnalysis();
 
   return (
-    <main className="w-full h-full max-h-full overflow-hidden text-white flex flex-col items-center justify-start p-1 print:bg-white print:text-black print:block print:p-0 print:m-0 print:w-full print:h-auto print:max-h-none print:overflow-visible">
+    <main className="w-full h-full max-h-full overflow-hidden text-white flex flex-col items-center justify-start p-1">
       <InventoryModal
         minAmountFilter={minAmountFilter}
         setMinAmountFilter={setMinAmountFilter}

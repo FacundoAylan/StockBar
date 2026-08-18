@@ -1,5 +1,5 @@
 import React from "react";
-import type { InventoryItem } from "../../../../types/inventory";
+import type { InventoryItem } from "@/types/inventory";
 import { analyzeItem } from "../../utils/inventoryHelpers";
 
 interface InventoryItemRowProps {
@@ -42,7 +42,7 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
   } = analyzeItem(item, categoryName, forceAllBtl);
 
   return (
-    <li className="py-3 flex flex-col sm:flex-row sm:items-center justify-between text-sm gap-2 px-2 rounded-lg avoid-break print:break-inside-avoid hover:bg-neutral-100/50 transition-colors">
+    <li className="py-3 flex flex-col sm:flex-row sm:items-center justify-between text-sm gap-2 px-2 rounded-lg avoid-break hover:bg-neutral-100/50 transition-colors">
       {/* 🎯 NOMBRE DEL ARTÍCULO + VENDIDO Y USADO */}
       <div className="flex flex-col">
         <span className="font-semibold text-neutral-800">
@@ -85,7 +85,7 @@ export const InventoryItemRow: React.FC<InventoryItemRowProps> = ({
 
         {/* 🎯 BOTONES DE MODO EDICIÓN */}
         {editMode && (
-          <div className="flex items-center gap-1.5 ml-2 print:hidden">
+          <div className="flex items-center gap-1.5 ml-2">
             <button
               type="button"
               onClick={() => onToggleUnit(groupIndex, itemIdx)}
